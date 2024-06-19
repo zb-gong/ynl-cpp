@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
 
 import argparse
 import collections
@@ -2262,7 +2261,7 @@ def main():
         for one in args.user_header:
             cw.p(f'#include "{one}"')
 
-    cw.p("namespace ynl {")
+    cw.p("namespace ynl_cpp {")
     if args.header:
         render_user_family(parsed, cw, True)
     cw.nl()
@@ -2400,7 +2399,7 @@ def main():
         cw.nl()
         render_user_family(parsed, cw, False)
 
-    cw.p("} //namespace ynl")
+    cw.p("} //namespace ynl_cpp")
 
     if args.header:
         cw.p(f"#endif /* {hdr_prot} */")
