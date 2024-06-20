@@ -32,7 +32,7 @@ distclean: clean
 %.o: %.c
 	$(COMPILE.c) -MMD -c -o $@ $<
 
-%.cpp.o: %.c
+%.cpp.o: %.cpp
 	$(COMPILE.cxx) -MMD -c -o $@ $<
 
 .PHONY: all clean distclean

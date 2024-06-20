@@ -44,9 +44,9 @@ typedef int (
     *ynl_parse_cb_t)(const struct nlmsghdr* nlh, struct ynl_parse_arg* yarg);
 
 struct ynl_policy_attr {
+  const char* name;
   enum ynl_policy_type type;
   unsigned int len;
-  const char* name;
   struct ynl_policy_nest* nest;
 };
 
@@ -128,8 +128,8 @@ struct ynl_dump_no_alloc_state {
 };
 
 struct ynl_ntf_info {
-  struct ynl_policy_nest* policy;
   ynl_parse_cb_t cb;
+  struct ynl_policy_nest* policy;
   size_t alloc_sz;
   void (*free)(struct ynl_ntf_base_type* ntf);
 };
