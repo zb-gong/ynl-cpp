@@ -205,7 +205,7 @@ operations:
 
     -
       name: key-rotate
-      doc: Rotate the secret state.
+      doc: Rotate the device key.
       attribute-set: dev
       do:
         request:
@@ -218,7 +218,7 @@ operations:
         post: psp-device-unlock
     -
       name: key-rotate-ntf
-      doc: Notification about secret state getting rotated.
+      doc: Notification about device key getting rotated.
       notify: key-rotate
       mcgrp: use
 
