@@ -246,6 +246,9 @@ static std::array<ynl_policy_attr,DPLL_A_PIN_MAX + 1> dpll_pin_policy = []() {
 	arr[DPLL_A_PIN_PHASE_ADJUST] = { .name = "phase-adjust", .type = YNL_PT_U32, };
 	arr[DPLL_A_PIN_PHASE_OFFSET] = { .name = "phase-offset", .type = YNL_PT_U64, };
 	arr[DPLL_A_PIN_FRACTIONAL_FREQUENCY_OFFSET] = { .name = "fractional-frequency-offset", .type = YNL_PT_UINT, };
+	arr[DPLL_A_PIN_ESYNC_FREQUENCY] = { .name = "esync-frequency", .type = YNL_PT_U64, };
+	arr[DPLL_A_PIN_ESYNC_FREQUENCY_SUPPORTED] = { .name = "esync-frequency-supported", .type = YNL_PT_NEST, .nest = &dpll_frequency_range_nest, };
+	arr[DPLL_A_PIN_ESYNC_PULSE] = { .name = "esync-pulse", .type = YNL_PT_U32, };
 	return arr;
 } ();
 
@@ -634,6 +637,7 @@ dpll_pin_id_get(ynl_cpp::ynl_socket&  ys, dpll_pin_id_get_req& req)
 int dpll_pin_get_rsp_parse(const struct nlmsghdr *nlh,
 			   struct ynl_parse_arg *yarg)
 {
+	unsigned int n_esync_frequency_supported = 0;
 	unsigned int n_frequency_supported = 0;
 	unsigned int n_parent_device = 0;
 	unsigned int n_parent_pin = 0;
@@ -645,6 +649,8 @@ int dpll_pin_get_rsp_parse(const struct nlmsghdr *nlh,
 	dst = (dpll_pin_get_rsp*)yarg->data;
 	parg.ys = yarg->ys;
 
+	if (dst->esync_frequency_supported.size() > 0)
+		return ynl_error_parse(yarg, "attribute already present (pin.esync-frequency-supported)");
 	if (dst->frequency_supported.size() > 0)
 		return ynl_error_parse(yarg, "attribute already present (pin.frequency-supported)");
 	if (dst->parent_device.size() > 0)
@@ -705,9 +711,32 @@ int dpll_pin_get_rsp_parse(const struct nlmsghdr *nlh,
 			if (ynl_attr_validate(yarg, attr))
 				return YNL_PARSE_CB_ERROR;
 			dst->fractional_frequency_offset = (__s64)ynl_attr_get_sint(attr);
+		} else if (type == DPLL_A_PIN_ESYNC_FREQUENCY) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->esync_frequency = (__u64)ynl_attr_get_u64(attr);
+		} else if (type == DPLL_A_PIN_ESYNC_FREQUENCY_SUPPORTED) {
+			n_esync_frequency_supported++;
+		} else if (type == DPLL_A_PIN_ESYNC_PULSE) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->esync_pulse = (__u32)ynl_attr_get_u32(attr);
 		}
 	}
 
+	if (n_esync_frequency_supported) {
+		dst->esync_frequency_supported.resize(n_esync_frequency_supported);
+		i = 0;
+		parg.rsp_policy = &dpll_frequency_range_nest;
+		ynl_attr_for_each(attr, nlh, yarg->ys->family->hdr_len) {
+			if (ynl_attr_type(attr) == DPLL_A_PIN_ESYNC_FREQUENCY_SUPPORTED) {
+				parg.data = &dst->esync_frequency_supported[i];
+				if (dpll_frequency_range_parse(&parg, attr))
+					return YNL_PARSE_CB_ERROR;
+				i++;
+			}
+		}
+	}
 	if (n_frequency_supported) {
 		dst->frequency_supported.resize(n_frequency_supported);
 		i = 0;
@@ -835,6 +864,8 @@ int dpll_pin_set(ynl_cpp::ynl_socket&  ys, dpll_pin_set_req& req)
 		dpll_pin_parent_pin_put(nlh, DPLL_A_PIN_PARENT_PIN, req.parent_pin[i]);
 	if (req.phase_adjust.has_value())
 		ynl_attr_put_s32(nlh, DPLL_A_PIN_PHASE_ADJUST, req.phase_adjust.value());
+	if (req.esync_frequency.has_value())
+		ynl_attr_put_u64(nlh, DPLL_A_PIN_ESYNC_FREQUENCY, req.esync_frequency.value());
 
 	err = ynl_exec(ys, nlh, &yrs);
 	if (err < 0)

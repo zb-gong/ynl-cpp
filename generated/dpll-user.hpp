@@ -164,10 +164,14 @@ struct dpll_pin_get_rsp {
 	std::optional<__s32> phase_adjust_max;
 	std::optional<__s32> phase_adjust;
 	std::optional<__s64> fractional_frequency_offset;
+	std::optional<__u64> esync_frequency;
+	std::vector<dpll_frequency_range> esync_frequency_supported;
+	std::optional<__u32> esync_pulse;
 };
 
 /*
  * Get list of pins and its attributes.
+
 - dump request without any attributes given - list all the pins in the
   system
 - dump request with target dpll - list all the pins registered with
@@ -205,6 +209,7 @@ struct dpll_pin_set_req {
 	std::vector<dpll_pin_parent_device> parent_device;
 	std::vector<dpll_pin_parent_pin> parent_pin;
 	std::optional<__s32> phase_adjust;
+	std::optional<__u64> esync_frequency;
 };
 
 /*

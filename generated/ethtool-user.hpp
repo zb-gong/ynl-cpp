@@ -17,7 +17,7 @@
 #include <string_view>
 #include <vector>
 
-#include <ynl.hpp>
+#include "ynl.hpp"
 
 #include <linux/ethtool.h>
 
@@ -29,12 +29,17 @@ std::string_view ethtool_op_str(int op);
 std::string_view ethtool_udp_tunnel_type_str(int value);
 std::string_view ethtool_stringset_str(ethtool_stringset value);
 std::string_view ethtool_header_flags_str(ethtool_header_flags value);
+std::string_view
+ethtool_module_fw_flash_status_str(ethtool_module_fw_flash_status value);
+std::string_view ethtool_c33_pse_ext_state_str(int value);
+std::string_view ethtool_phy_upstream_type_str(int value);
 
 /* Common nested types */
 struct ethtool_header {
 	std::optional<__u32> dev_index;
 	std::string dev_name;
 	std::optional<__u32> flags;
+	std::optional<__u32> phy_index;
 };
 
 struct ethtool_pause_stat {
@@ -61,6 +66,11 @@ struct ethtool_fec_stat {
 	std::vector<__u8> corr_bits;
 };
 
+struct ethtool_c33_pse_pw_limit {
+	std::optional<__u32> min;
+	std::optional<__u32> max;
+};
+
 struct ethtool_mm_stat {
 	std::optional<__u64> reassembly_errors;
 	std::optional<__u64> smd_errors;
@@ -70,14 +80,22 @@ struct ethtool_mm_stat {
 	std::optional<__u64> hold_count;
 };
 
+struct ethtool_irq_moderation {
+	std::optional<__u32> usec;
+	std::optional<__u32> pkts;
+	std::optional<__u32> comps;
+};
+
 struct ethtool_cable_result {
 	std::optional<__u8> pair;
 	std::optional<__u8> code;
+	std::optional<__u32> src;
 };
 
 struct ethtool_cable_fault_length {
 	std::optional<__u8> pair;
 	std::optional<__u32> cm;
+	std::optional<__u32> src;
 };
 
 struct ethtool_stats_grp_hist {
@@ -100,6 +118,10 @@ struct ethtool_tunnel_udp_entry {
 struct ethtool_string {
 	std::optional<__u32> index;
 	std::string value;
+};
+
+struct ethtool_profile {
+	std::vector<ethtool_irq_moderation> irq_moderation;
 };
 
 struct ethtool_cable_nest {
@@ -710,6 +732,8 @@ struct ethtool_coalesce_get_rsp {
 	std::optional<__u32> tx_aggr_max_bytes;
 	std::optional<__u32> tx_aggr_max_frames;
 	std::optional<__u32> tx_aggr_time_usecs;
+	std::optional<ethtool_profile> rx_profile;
+	std::optional<ethtool_profile> tx_profile;
 };
 
 /*
@@ -766,6 +790,8 @@ struct ethtool_coalesce_set_req {
 	std::optional<__u32> tx_aggr_max_bytes;
 	std::optional<__u32> tx_aggr_max_frames;
 	std::optional<__u32> tx_aggr_time_usecs;
+	std::optional<ethtool_profile> rx_profile;
+	std::optional<ethtool_profile> tx_profile;
 };
 
 /*
@@ -1186,6 +1212,12 @@ struct ethtool_pse_get_rsp {
 	std::optional<__u32> c33_pse_admin_state;
 	std::optional<__u32> c33_pse_admin_control;
 	std::optional<__u32> c33_pse_pw_d_status;
+	std::optional<__u32> c33_pse_pw_class;
+	std::optional<__u32> c33_pse_actual_pw;
+	std::optional<int> c33_pse_ext_state;
+	std::optional<__u32> c33_pse_ext_substate;
+	std::optional<__u32> c33_pse_avail_pw_limit;
+	std::vector<ethtool_c33_pse_pw_limit> c33_pse_pw_limit_ranges;
 };
 
 /*
@@ -1210,12 +1242,9 @@ ethtool_pse_get_dump(ynl_cpp::ynl_socket&  ys, ethtool_pse_get_req_dump& req);
 /* ETHTOOL_MSG_PSE_SET - do */
 struct ethtool_pse_set_req {
 	std::optional<ethtool_header> header;
-	std::optional<__u32> podl_pse_admin_state;
 	std::optional<__u32> podl_pse_admin_control;
-	std::optional<__u32> podl_pse_pw_d_status;
-	std::optional<__u32> c33_pse_admin_state;
 	std::optional<__u32> c33_pse_admin_control;
-	std::optional<__u32> c33_pse_pw_d_status;
+	std::optional<__u32> c33_pse_avail_pw_limit;
 };
 
 /*
@@ -1227,6 +1256,7 @@ int ethtool_pse_set(ynl_cpp::ynl_socket&  ys, ethtool_pse_set_req& req);
 /* ETHTOOL_MSG_RSS_GET - do */
 struct ethtool_rss_get_req {
 	std::optional<ethtool_header> header;
+	std::optional<__u32> context;
 };
 
 struct ethtool_rss_get_rsp {
@@ -1247,6 +1277,7 @@ ethtool_rss_get(ynl_cpp::ynl_socket&  ys, ethtool_rss_get_req& req);
 /* ETHTOOL_MSG_RSS_GET - dump */
 struct ethtool_rss_get_req_dump {
 	std::optional<ethtool_header> header;
+	std::optional<__u32> start_context;
 };
 
 struct ethtool_rss_get_list {
@@ -1412,6 +1443,55 @@ struct ethtool_mm_set_req {
  */
 int ethtool_mm_set(ynl_cpp::ynl_socket&  ys, ethtool_mm_set_req& req);
 
+/* ============== ETHTOOL_MSG_MODULE_FW_FLASH_ACT ============== */
+/* ETHTOOL_MSG_MODULE_FW_FLASH_ACT - do */
+struct ethtool_module_fw_flash_act_req {
+	std::optional<ethtool_header> header;
+	std::string file_name;
+	std::optional<__u32> password;
+};
+
+/*
+ * Flash transceiver module firmware.
+ */
+int ethtool_module_fw_flash_act(ynl_cpp::ynl_socket&  ys,
+				ethtool_module_fw_flash_act_req& req);
+
+/* ============== ETHTOOL_MSG_PHY_GET ============== */
+/* ETHTOOL_MSG_PHY_GET - do */
+struct ethtool_phy_get_req {
+	std::optional<ethtool_header> header;
+};
+
+struct ethtool_phy_get_rsp {
+	std::optional<ethtool_header> header;
+	std::optional<__u32> index;
+	std::string drvname;
+	std::string name;
+	std::optional<int> upstream_type;
+	std::optional<__u32> upstream_index;
+	std::string upstream_sfp_name;
+	std::string downstream_sfp_name;
+};
+
+/*
+ * Get PHY devices attached to an interface
+ */
+std::unique_ptr<ethtool_phy_get_rsp>
+ethtool_phy_get(ynl_cpp::ynl_socket&  ys, ethtool_phy_get_req& req);
+
+/* ETHTOOL_MSG_PHY_GET - dump */
+struct ethtool_phy_get_req_dump {
+	std::optional<ethtool_header> header;
+};
+
+struct ethtool_phy_get_list {
+	std::list<ethtool_phy_get_rsp> objs;
+};
+
+std::unique_ptr<ethtool_phy_get_list>
+ethtool_phy_get_dump(ynl_cpp::ynl_socket&  ys, ethtool_phy_get_req_dump& req);
+
 /* ETHTOOL_MSG_CABLE_TEST_NTF - event */
 struct ethtool_cable_test_ntf_rsp {
 	std::optional<ethtool_header> header;
@@ -1429,6 +1509,18 @@ struct ethtool_cable_test_tdr_ntf_rsp {
 };
 
 struct ethtool_cable_test_tdr_ntf {
+};
+
+/* ETHTOOL_MSG_MODULE_FW_FLASH_NTF - event */
+struct ethtool_module_fw_flash_ntf_rsp {
+	std::optional<ethtool_header> header;
+	std::optional<ethtool_module_fw_flash_status> status;
+	std::string status_msg;
+	std::optional<__u64> done;
+	std::optional<__u64> total;
+};
+
+struct ethtool_module_fw_flash_ntf {
 };
 
 } //namespace ynl_cpp

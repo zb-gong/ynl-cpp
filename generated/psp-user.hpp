@@ -91,7 +91,7 @@ struct psp_key_rotate_rsp {
 };
 
 /*
- * Rotate the secret state.
+ * Rotate the device key.
  */
 std::unique_ptr<psp_key_rotate_rsp>
 psp_key_rotate(ynl_cpp::ynl_socket&  ys, psp_key_rotate_req& req);

@@ -225,6 +225,7 @@ static std::array<ynl_policy_attr,NETDEV_A_QSTATS_MAX + 1> netdev_qstats_policy 
 	arr[NETDEV_A_QSTATS_RX_ALLOC_FAIL] = { .name = "rx-alloc-fail", .type = YNL_PT_UINT, };
 	arr[NETDEV_A_QSTATS_RX_HW_DROPS] = { .name = "rx-hw-drops", .type = YNL_PT_UINT, };
 	arr[NETDEV_A_QSTATS_RX_HW_DROP_OVERRUNS] = { .name = "rx-hw-drop-overruns", .type = YNL_PT_UINT, };
+	arr[NETDEV_A_QSTATS_RX_CSUM_COMPLETE] = { .name = "rx-csum-complete", .type = YNL_PT_UINT, };
 	arr[NETDEV_A_QSTATS_RX_CSUM_UNNECESSARY] = { .name = "rx-csum-unnecessary", .type = YNL_PT_UINT, };
 	arr[NETDEV_A_QSTATS_RX_CSUM_NONE] = { .name = "rx-csum-none", .type = YNL_PT_UINT, };
 	arr[NETDEV_A_QSTATS_RX_CSUM_BAD] = { .name = "rx-csum-bad", .type = YNL_PT_UINT, };
