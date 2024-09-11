@@ -3,20 +3,48 @@
 CC=gcc
 CXX=g++
 CFLAGS=-std=gnu11 -O2 -W -Wall -Wextra -Wno-unused-parameter -Wshadow -I../lib/
-CXXFLAGS=-D_LINUX_ETHTOOL_H -I../lib/ -include../linux/ethtool_netlink.h  -include../linux/ethtool.h
 ifeq ("$(DEBUG)","1")
   CFLAGS += -g -fsanitize=address -fsanitize=leak -static-libasan
 endif
 
-SRCS_ETHTOOL_CPP=$(wildcard ethtool-user.cpp)
-OBJS_ETHTOOL_CPP=$(patsubst %.cpp,%.o,${SRCS_ETHTOOL_CPP})
+CXXFLAGS=-I../lib/ -I../
+
+include ../Makefile.deps
+
+TOOL:=../ynl-gen-cpp.py
+
+GENS_PATHS=$(shell grep -nrI --files-without-match \
+		'protocol: netlink' ../Documentation/netlink/specs/)
+GENS_ALL=$(patsubst ../Documentation/netlink/specs/%.yaml,%,${GENS_PATHS})
+GENS=$(filter-out devlink ovs_datapath ovs_flow ovs_vport nlctrl,${GENS_ALL})
+SRCS=$(patsubst %,%-user.cpp,${GENS})
+HDRS=$(patsubst %,%-user.hpp,${GENS})
+OBJS=$(patsubst %,%-user.cpp.o,${GENS})
+LIBS=$(patsubst %,%_lib.a,${GENS})
 
 include $(wildcard *.d)
 
-all: ethtool_lib.a
+ifeq ($(V),1)
+Q =
+else
+Q = @
+endif
 
-ethtool_lib.a: $@ $(OBJS_ETHTOOL_CPP)
-	ar rcs $@ $(OBJS_ETHTOOL_CPP)
+all: $(LIBS)
+	@echo -e "\tAR libynl.a"
+	$(Q)ar rcs libynl.a $(OBJS)
+
+%-user.hpp: ../Documentation/netlink/specs/%.yaml $(TOOL)
+	@echo -e "\tGEN $@"
+	$(Q)$(TOOL) --mode user --header --spec $< -o $@ $(YNL_GEN_ARG_$*)
+
+%-user.cpp: ../Documentation/netlink/specs/%.yaml $(TOOL)
+	@echo -e "\tGEN $@"
+	$(Q)$(TOOL) --mode user --source --spec $< -o $@ $(YNL_GEN_ARG_$*)
+
+%-user.cpp.o: %-user.cpp %-user.hpp
+	@echo -e "\tCXX $@ "
+	$(Q)$(COMPILE.cpp) $(CFLAGS_$*) -MMD -c -o $@ $<
 
 clean:
 	rm -f *.o *.d *~
@@ -24,8 +52,9 @@ clean:
 distclean: clean
 	rm -f *.a
 
-%.cpp.o: %.cpp
-	$(COMPILE.cxx) -MMD -c -o $@ $<
+%_lib.a: $@ %-user.cpp.o
+	@echo -e "\tAR $@"
+	$(Q)ar rcs $@ $<
 
 .PHONY: all clean distclean
 .DEFAULT_GOAL=all
