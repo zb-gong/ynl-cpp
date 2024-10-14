@@ -935,7 +935,7 @@ class Family(SpecFamily):
         if "uapi-header" in self.yaml:
             self.uapi_header = self.yaml["uapi-header"]
         else:
-            self.uapi_header = f"linux/{self.name}.h"
+            self.uapi_header = f"linux/{c_lower(self.name)}.h"
         if self.uapi_header.startswith("linux/") and self.uapi_header.endswith(".h"):
             self.uapi_header_name = self.uapi_header[6:-2]
         else:
@@ -2243,7 +2243,8 @@ def main():
         cw.nl()
         cw.p('#include "ynl.hpp"')
     else:
-        cw.p(f'#include "{parsed.name}-user.hpp"')
+        hdr_file = os.path.basename(args.out_file[:-4]) + ".hpp"
+        cw.p(f'#include "{hdr_file}"')
         cw.nl()
         cw.p("#include <array>")
     cw.nl()
