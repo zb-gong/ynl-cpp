@@ -38,6 +38,11 @@ struct netdev_page_pool_info {
 	std::optional<__u32> ifindex;
 };
 
+struct netdev_queue_id {
+	std::optional<__u32> id;
+	std::optional<netdev_queue_type> type;
+};
+
 /* ============== NETDEV_CMD_DEV_GET ============== */
 /* NETDEV_CMD_DEV_GET - do */
 struct netdev_dev_get_req {
@@ -83,6 +88,7 @@ struct netdev_page_pool_get_rsp {
 	std::optional<__u64> inflight;
 	std::optional<__u64> inflight_mem;
 	std::optional<__u64> detach_time;
+	std::optional<__u32> dmabuf;
 };
 
 /*
@@ -154,6 +160,7 @@ struct netdev_queue_get_rsp {
 	std::optional<netdev_queue_type> type;
 	std::optional<__u32> napi_id;
 	std::optional<__u32> ifindex;
+	std::optional<__u32> dmabuf;
 };
 
 /*
@@ -229,6 +236,24 @@ struct netdev_qstats_get_rsp_list {
 std::unique_ptr<netdev_qstats_get_rsp_list>
 netdev_qstats_get_dump(ynl_cpp::ynl_socket&  ys,
 		       netdev_qstats_get_req_dump& req);
+
+/* ============== NETDEV_CMD_BIND_RX ============== */
+/* NETDEV_CMD_BIND_RX - do */
+struct netdev_bind_rx_req {
+	std::optional<__u32> ifindex;
+	std::optional<__u32> fd;
+	std::vector<netdev_queue_id> queues;
+};
+
+struct netdev_bind_rx_rsp {
+	std::optional<__u32> id;
+};
+
+/*
+ * Bind dmabuf to netdev
+ */
+std::unique_ptr<netdev_bind_rx_rsp>
+netdev_bind_rx(ynl_cpp::ynl_socket&  ys, netdev_bind_rx_req& req);
 
 } //namespace ynl_cpp
 #endif /* _LINUX_NETDEV_GEN_H */

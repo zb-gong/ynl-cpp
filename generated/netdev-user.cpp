@@ -14,8 +14,8 @@
 namespace ynl_cpp {
 
 /* Enums */
-static constexpr std::array<std::string_view, NETDEV_CMD_QSTATS_GET + 1> netdev_op_strmap = []() {
-	std::array<std::string_view, NETDEV_CMD_QSTATS_GET + 1> arr{};
+static constexpr std::array<std::string_view, NETDEV_CMD_BIND_RX + 1> netdev_op_strmap = []() {
+	std::array<std::string_view, NETDEV_CMD_BIND_RX + 1> arr{};
 	arr[NETDEV_CMD_DEV_GET] = "dev-get";
 	arr[NETDEV_CMD_DEV_ADD_NTF] = "dev-add-ntf";
 	arr[NETDEV_CMD_DEV_DEL_NTF] = "dev-del-ntf";
@@ -28,6 +28,7 @@ static constexpr std::array<std::string_view, NETDEV_CMD_QSTATS_GET + 1> netdev_
 	arr[NETDEV_CMD_QUEUE_GET] = "queue-get";
 	arr[NETDEV_CMD_NAPI_GET] = "napi-get";
 	arr[NETDEV_CMD_QSTATS_GET] = "qstats-get";
+	arr[NETDEV_CMD_BIND_RX] = "bind-rx";
 	return arr;
 } ();
 
@@ -130,6 +131,18 @@ struct ynl_policy_nest netdev_page_pool_info_nest = {
 	.table = netdev_page_pool_info_policy.data(),
 };
 
+static std::array<ynl_policy_attr,NETDEV_A_QUEUE_MAX + 1> netdev_queue_id_policy = []() {
+	std::array<ynl_policy_attr,NETDEV_A_QUEUE_MAX + 1> arr{};
+	arr[NETDEV_A_QUEUE_ID] = { .name = "id", .type = YNL_PT_U32, };
+	arr[NETDEV_A_QUEUE_TYPE] = { .name = "type", .type = YNL_PT_U32, };
+	return arr;
+} ();
+
+struct ynl_policy_nest netdev_queue_id_nest = {
+	.max_attr = NETDEV_A_QUEUE_MAX,
+	.table = netdev_queue_id_policy.data(),
+};
+
 static std::array<ynl_policy_attr,NETDEV_A_DEV_MAX + 1> netdev_dev_policy = []() {
 	std::array<ynl_policy_attr,NETDEV_A_DEV_MAX + 1> arr{};
 	arr[NETDEV_A_DEV_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, };
@@ -154,6 +167,7 @@ static std::array<ynl_policy_attr,NETDEV_A_PAGE_POOL_MAX + 1> netdev_page_pool_p
 	arr[NETDEV_A_PAGE_POOL_INFLIGHT] = { .name = "inflight", .type = YNL_PT_UINT, };
 	arr[NETDEV_A_PAGE_POOL_INFLIGHT_MEM] = { .name = "inflight-mem", .type = YNL_PT_UINT, };
 	arr[NETDEV_A_PAGE_POOL_DETACH_TIME] = { .name = "detach-time", .type = YNL_PT_UINT, };
+	arr[NETDEV_A_PAGE_POOL_DMABUF] = { .name = "dmabuf", .type = YNL_PT_U32, };
 	return arr;
 } ();
 
@@ -190,6 +204,7 @@ static std::array<ynl_policy_attr,NETDEV_A_QUEUE_MAX + 1> netdev_queue_policy = 
 	arr[NETDEV_A_QUEUE_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, };
 	arr[NETDEV_A_QUEUE_TYPE] = { .name = "type", .type = YNL_PT_U32, };
 	arr[NETDEV_A_QUEUE_NAPI_ID] = { .name = "napi-id", .type = YNL_PT_U32, };
+	arr[NETDEV_A_QUEUE_DMABUF] = { .name = "dmabuf", .type = YNL_PT_U32, };
 	return arr;
 } ();
 
@@ -253,6 +268,20 @@ struct ynl_policy_nest netdev_qstats_nest = {
 	.table = netdev_qstats_policy.data(),
 };
 
+static std::array<ynl_policy_attr,NETDEV_A_DMABUF_MAX + 1> netdev_dmabuf_policy = []() {
+	std::array<ynl_policy_attr,NETDEV_A_DMABUF_MAX + 1> arr{};
+	arr[NETDEV_A_DMABUF_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, };
+	arr[NETDEV_A_DMABUF_QUEUES] = { .name = "queues", .type = YNL_PT_NEST, .nest = &netdev_queue_id_nest, };
+	arr[NETDEV_A_DMABUF_FD] = { .name = "fd", .type = YNL_PT_U32, };
+	arr[NETDEV_A_DMABUF_ID] = { .name = "id", .type = YNL_PT_U32, };
+	return arr;
+} ();
+
+struct ynl_policy_nest netdev_dmabuf_nest = {
+	.max_attr = NETDEV_A_DMABUF_MAX,
+	.table = netdev_dmabuf_policy.data(),
+};
+
 /* Common nested types */
 int netdev_page_pool_info_put(struct nlmsghdr *nlh, unsigned int attr_type,
 			      const netdev_page_pool_info&  obj)
@@ -288,6 +317,21 @@ int netdev_page_pool_info_parse(struct ynl_parse_arg *yarg,
 			dst->ifindex = (__u32)ynl_attr_get_u32(attr);
 		}
 	}
+
+	return 0;
+}
+
+int netdev_queue_id_put(struct nlmsghdr *nlh, unsigned int attr_type,
+			const netdev_queue_id&  obj)
+{
+	struct nlattr *nest;
+
+	nest = ynl_attr_nest_start(nlh, attr_type);
+	if (obj.id.has_value())
+		ynl_attr_put_u32(nlh, NETDEV_A_QUEUE_ID, obj.id.value());
+	if (obj.type.has_value())
+		ynl_attr_put_u32(nlh, NETDEV_A_QUEUE_TYPE, obj.type.value());
+	ynl_attr_nest_end(nlh, nest);
 
 	return 0;
 }
@@ -421,6 +465,10 @@ int netdev_page_pool_get_rsp_parse(const struct nlmsghdr *nlh,
 			if (ynl_attr_validate(yarg, attr))
 				return YNL_PARSE_CB_ERROR;
 			dst->detach_time = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == NETDEV_A_PAGE_POOL_DMABUF) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->dmabuf = (__u32)ynl_attr_get_u32(attr);
 		}
 	}
 
@@ -635,6 +683,10 @@ int netdev_queue_get_rsp_parse(const struct nlmsghdr *nlh,
 			if (ynl_attr_validate(yarg, attr))
 				return YNL_PARSE_CB_ERROR;
 			dst->ifindex = (__u32)ynl_attr_get_u32(attr);
+		} else if (type == NETDEV_A_QUEUE_DMABUF) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->dmabuf = (__u32)ynl_attr_get_u32(attr);
 		}
 	}
 
@@ -868,6 +920,60 @@ netdev_qstats_get_dump(ynl_cpp::ynl_socket&  ys,
 		return nullptr;
 
 	return ret;
+}
+
+/* ============== NETDEV_CMD_BIND_RX ============== */
+/* NETDEV_CMD_BIND_RX - do */
+int netdev_bind_rx_rsp_parse(const struct nlmsghdr *nlh,
+			     struct ynl_parse_arg *yarg)
+{
+	const struct nlattr *attr;
+	netdev_bind_rx_rsp *dst;
+
+	dst = (netdev_bind_rx_rsp*)yarg->data;
+
+	ynl_attr_for_each(attr, nlh, yarg->ys->family->hdr_len) {
+		unsigned int type = ynl_attr_type(attr);
+
+		if (type == NETDEV_A_DMABUF_ID) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->id = (__u32)ynl_attr_get_u32(attr);
+		}
+	}
+
+	return YNL_PARSE_CB_OK;
+}
+
+std::unique_ptr<netdev_bind_rx_rsp>
+netdev_bind_rx(ynl_cpp::ynl_socket&  ys, netdev_bind_rx_req& req)
+{
+	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
+	std::unique_ptr<netdev_bind_rx_rsp> rsp;
+	struct nlmsghdr *nlh;
+	int err;
+
+	nlh = ynl_gemsg_start_req(ys, ((struct ynl_sock*)ys)->family_id, NETDEV_CMD_BIND_RX, 1);
+	((struct ynl_sock*)ys)->req_policy = &netdev_dmabuf_nest;
+	yrs.yarg.rsp_policy = &netdev_dmabuf_nest;
+
+	if (req.ifindex.has_value())
+		ynl_attr_put_u32(nlh, NETDEV_A_DMABUF_IFINDEX, req.ifindex.value());
+	if (req.fd.has_value())
+		ynl_attr_put_u32(nlh, NETDEV_A_DMABUF_FD, req.fd.value());
+	for (unsigned int i = 0; i < req.queues.size(); i++)
+		netdev_queue_id_put(nlh, NETDEV_A_DMABUF_QUEUES, req.queues[i]);
+
+	rsp.reset(new netdev_bind_rx_rsp());
+	yrs.yarg.data = rsp.get();
+	yrs.cb = netdev_bind_rx_rsp_parse;
+	yrs.rsp_cmd = NETDEV_CMD_BIND_RX;
+
+	err = ynl_exec(ys, nlh, &yrs);
+	if (err < 0)
+		return nullptr;
+
+	return rsp;
 }
 
 static constexpr std::array<ynl_ntf_info, NETDEV_CMD_PAGE_POOL_CHANGE_NTF + 1> netdev_ntf_info = []() {

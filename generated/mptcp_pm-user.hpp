@@ -34,7 +34,7 @@ struct mptcp_pm_address {
 	std::optional<__u8> id;
 	std::optional<__u32> addr4 /* big-endian */;
 	std::vector<__u8> addr6;
-	std::optional<__u16> port /* big-endian */;
+	std::optional<__u16> port;
 	std::optional<__u32> flags;
 	std::optional<__s32> if_idx;
 };
