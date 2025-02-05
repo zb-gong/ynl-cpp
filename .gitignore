@@ -1,1 +1,3 @@
 *.a
+*.o
+lib/__pycache__/
