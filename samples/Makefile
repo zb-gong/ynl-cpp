@@ -17,7 +17,7 @@ all: $(BINS)
 
 $(BINS): ../lib/ynl.a $(PROTOS) $(SRCS)
 	@echo -e '\tCXX sample $@  '
-	@$(COMPILE.cpp) $(CPPFLAGS_$@) $@.cpp -o $@.o
+	@$(COMPILE.cpp) $(CFLAGS_$@) $@.cpp -o $@.o
 	@$(LINK.cpp) $@.o -o $@ ../generated/$(patsubst %,%_lib.a,$@) $(LDLIBS)
 
 clean:
