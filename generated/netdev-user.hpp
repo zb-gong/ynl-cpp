@@ -192,6 +192,9 @@ struct netdev_napi_get_rsp {
 	std::optional<__u32> ifindex;
 	std::optional<__u32> irq;
 	std::optional<__u32> pid;
+	std::optional<__u32> defer_hard_irqs;
+	std::optional<__u64> gro_flush_timeout;
+	std::optional<__u64> irq_suspend_timeout;
 };
 
 /*
@@ -254,6 +257,20 @@ struct netdev_bind_rx_rsp {
  */
 std::unique_ptr<netdev_bind_rx_rsp>
 netdev_bind_rx(ynl_cpp::ynl_socket&  ys, netdev_bind_rx_req& req);
+
+/* ============== NETDEV_CMD_NAPI_SET ============== */
+/* NETDEV_CMD_NAPI_SET - do */
+struct netdev_napi_set_req {
+	std::optional<__u32> id;
+	std::optional<__u32> defer_hard_irqs;
+	std::optional<__u64> gro_flush_timeout;
+	std::optional<__u64> irq_suspend_timeout;
+};
+
+/*
+ * Set configurable NAPI instance settings.
+ */
+int netdev_napi_set(ynl_cpp::ynl_socket&  ys, netdev_napi_set_req& req);
 
 } //namespace ynl_cpp
 #endif /* _LINUX_NETDEV_GEN_H */

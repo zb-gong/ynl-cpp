@@ -14,8 +14,8 @@
 namespace ynl_cpp {
 
 /* Enums */
-static constexpr std::array<std::string_view, NETDEV_CMD_BIND_RX + 1> netdev_op_strmap = []() {
-	std::array<std::string_view, NETDEV_CMD_BIND_RX + 1> arr{};
+static constexpr std::array<std::string_view, NETDEV_CMD_NAPI_SET + 1> netdev_op_strmap = []() {
+	std::array<std::string_view, NETDEV_CMD_NAPI_SET + 1> arr{};
 	arr[NETDEV_CMD_DEV_GET] = "dev-get";
 	arr[NETDEV_CMD_DEV_ADD_NTF] = "dev-add-ntf";
 	arr[NETDEV_CMD_DEV_DEL_NTF] = "dev-del-ntf";
@@ -29,6 +29,7 @@ static constexpr std::array<std::string_view, NETDEV_CMD_BIND_RX + 1> netdev_op_
 	arr[NETDEV_CMD_NAPI_GET] = "napi-get";
 	arr[NETDEV_CMD_QSTATS_GET] = "qstats-get";
 	arr[NETDEV_CMD_BIND_RX] = "bind-rx";
+	arr[NETDEV_CMD_NAPI_SET] = "napi-set";
 	return arr;
 } ();
 
@@ -219,6 +220,9 @@ static std::array<ynl_policy_attr,NETDEV_A_NAPI_MAX + 1> netdev_napi_policy = []
 	arr[NETDEV_A_NAPI_ID] = { .name = "id", .type = YNL_PT_U32, };
 	arr[NETDEV_A_NAPI_IRQ] = { .name = "irq", .type = YNL_PT_U32, };
 	arr[NETDEV_A_NAPI_PID] = { .name = "pid", .type = YNL_PT_U32, };
+	arr[NETDEV_A_NAPI_DEFER_HARD_IRQS] = { .name = "defer-hard-irqs", .type = YNL_PT_U32, };
+	arr[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT] = { .name = "gro-flush-timeout", .type = YNL_PT_UINT, };
+	arr[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT] = { .name = "irq-suspend-timeout", .type = YNL_PT_UINT, };
 	return arr;
 } ();
 
@@ -782,6 +786,18 @@ int netdev_napi_get_rsp_parse(const struct nlmsghdr *nlh,
 			if (ynl_attr_validate(yarg, attr))
 				return YNL_PARSE_CB_ERROR;
 			dst->pid = (__u32)ynl_attr_get_u32(attr);
+		} else if (type == NETDEV_A_NAPI_DEFER_HARD_IRQS) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->defer_hard_irqs = (__u32)ynl_attr_get_u32(attr);
+		} else if (type == NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gro_flush_timeout = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->irq_suspend_timeout = (__u64)ynl_attr_get_uint(attr);
 		}
 	}
 
@@ -974,6 +990,33 @@ netdev_bind_rx(ynl_cpp::ynl_socket&  ys, netdev_bind_rx_req& req)
 		return nullptr;
 
 	return rsp;
+}
+
+/* ============== NETDEV_CMD_NAPI_SET ============== */
+/* NETDEV_CMD_NAPI_SET - do */
+int netdev_napi_set(ynl_cpp::ynl_socket&  ys, netdev_napi_set_req& req)
+{
+	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
+	struct nlmsghdr *nlh;
+	int err;
+
+	nlh = ynl_gemsg_start_req(ys, ((struct ynl_sock*)ys)->family_id, NETDEV_CMD_NAPI_SET, 1);
+	((struct ynl_sock*)ys)->req_policy = &netdev_napi_nest;
+
+	if (req.id.has_value())
+		ynl_attr_put_u32(nlh, NETDEV_A_NAPI_ID, req.id.value());
+	if (req.defer_hard_irqs.has_value())
+		ynl_attr_put_u32(nlh, NETDEV_A_NAPI_DEFER_HARD_IRQS, req.defer_hard_irqs.value());
+	if (req.gro_flush_timeout.has_value())
+		ynl_attr_put_uint(nlh, NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT, req.gro_flush_timeout.value());
+	if (req.irq_suspend_timeout.has_value())
+		ynl_attr_put_uint(nlh, NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT, req.irq_suspend_timeout.value());
+
+	err = ynl_exec(ys, nlh, &yrs);
+	if (err < 0)
+		return -1;
+
+	return 0;
 }
 
 static constexpr std::array<ynl_ntf_info, NETDEV_CMD_PAGE_POOL_CHANGE_NTF + 1> netdev_ntf_info = []() {

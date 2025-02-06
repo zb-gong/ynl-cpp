@@ -19,6 +19,9 @@
 
 #include "ynl.hpp"
 
+#include <linux/ethtool_netlink_generated.h>
+#include <linux/ethtool.h>
+#include <linux/ethtool.h>
 #include <linux/ethtool.h>
 
 namespace ynl_cpp {
@@ -31,8 +34,10 @@ std::string_view ethtool_stringset_str(ethtool_stringset value);
 std::string_view ethtool_header_flags_str(ethtool_header_flags value);
 std::string_view
 ethtool_module_fw_flash_status_str(ethtool_module_fw_flash_status value);
-std::string_view ethtool_c33_pse_ext_state_str(int value);
+std::string_view
+ethtool_c33_pse_ext_state_str(ethtool_c33_pse_ext_state value);
 std::string_view ethtool_phy_upstream_type_str(int value);
+std::string_view ethtool_tcp_data_split_str(ethtool_tcp_data_split value);
 
 /* Common nested types */
 struct ethtool_header {
@@ -51,6 +56,12 @@ struct ethtool_ts_stat {
 	std::optional<__u64> tx_pkts;
 	std::optional<__u64> tx_lost;
 	std::optional<__u64> tx_err;
+	std::optional<__u64> tx_onestep_pkts_unconfirmed;
+};
+
+struct ethtool_ts_hwtstamp_provider {
+	std::optional<__u32> index;
+	std::optional<__u32> qualifier;
 };
 
 struct ethtool_cable_test_tdr_cfg {
@@ -152,6 +163,8 @@ struct ethtool_bitset {
 	bool nomask{};
 	std::optional<__u32> size;
 	std::optional<ethtool_bitset_bits> bits;
+	std::vector<__u8> value;
+	std::vector<__u8> mask;
 };
 
 struct ethtool_stringset_t {
@@ -579,12 +592,14 @@ struct ethtool_rings_get_rsp {
 	std::optional<__u32> rx_jumbo;
 	std::optional<__u32> tx;
 	std::optional<__u32> rx_buf_len;
-	std::optional<__u8> tcp_data_split;
+	std::optional<ethtool_tcp_data_split> tcp_data_split;
 	std::optional<__u32> cqe_size;
 	std::optional<__u8> tx_push;
 	std::optional<__u8> rx_push;
 	std::optional<__u32> tx_push_buf_len;
 	std::optional<__u32> tx_push_buf_len_max;
+	std::optional<__u32> hds_thresh;
+	std::optional<__u32> hds_thresh_max;
 };
 
 /*
@@ -623,12 +638,14 @@ struct ethtool_rings_set_req {
 	std::optional<__u32> rx_jumbo;
 	std::optional<__u32> tx;
 	std::optional<__u32> rx_buf_len;
-	std::optional<__u8> tcp_data_split;
+	std::optional<ethtool_tcp_data_split> tcp_data_split;
 	std::optional<__u32> cqe_size;
 	std::optional<__u8> tx_push;
 	std::optional<__u8> rx_push;
 	std::optional<__u32> tx_push_buf_len;
 	std::optional<__u32> tx_push_buf_len_max;
+	std::optional<__u32> hds_thresh;
+	std::optional<__u32> hds_thresh_max;
 };
 
 /*
@@ -913,6 +930,7 @@ int ethtool_eee_set(ynl_cpp::ynl_socket&  ys, ethtool_eee_set_req& req);
 /* ETHTOOL_MSG_TSINFO_GET - do */
 struct ethtool_tsinfo_get_req {
 	std::optional<ethtool_header> header;
+	std::optional<ethtool_ts_hwtstamp_provider> hwtstamp_provider;
 };
 
 struct ethtool_tsinfo_get_rsp {
@@ -922,6 +940,7 @@ struct ethtool_tsinfo_get_rsp {
 	std::optional<ethtool_bitset> rx_filters;
 	std::optional<__u32> phc_index;
 	std::optional<ethtool_ts_stat> stats;
+	std::optional<ethtool_ts_hwtstamp_provider> hwtstamp_provider;
 };
 
 /*
@@ -933,6 +952,7 @@ ethtool_tsinfo_get(ynl_cpp::ynl_socket&  ys, ethtool_tsinfo_get_req& req);
 /* ETHTOOL_MSG_TSINFO_GET - dump */
 struct ethtool_tsinfo_get_req_dump {
 	std::optional<ethtool_header> header;
+	std::optional<ethtool_ts_hwtstamp_provider> hwtstamp_provider;
 };
 
 struct ethtool_tsinfo_get_list {
@@ -1214,7 +1234,7 @@ struct ethtool_pse_get_rsp {
 	std::optional<__u32> c33_pse_pw_d_status;
 	std::optional<__u32> c33_pse_pw_class;
 	std::optional<__u32> c33_pse_actual_pw;
-	std::optional<int> c33_pse_ext_state;
+	std::optional<ethtool_c33_pse_ext_state> c33_pse_ext_state;
 	std::optional<__u32> c33_pse_ext_substate;
 	std::optional<__u32> c33_pse_avail_pw_limit;
 	std::vector<ethtool_c33_pse_pw_limit> c33_pse_pw_limit_ranges;
@@ -1491,6 +1511,67 @@ struct ethtool_phy_get_list {
 
 std::unique_ptr<ethtool_phy_get_list>
 ethtool_phy_get_dump(ynl_cpp::ynl_socket&  ys, ethtool_phy_get_req_dump& req);
+
+/* ETHTOOL_MSG_PHY_GET - notify */
+struct ethtool_phy_get_ntf {
+};
+
+/* ============== ETHTOOL_MSG_TSCONFIG_GET ============== */
+/* ETHTOOL_MSG_TSCONFIG_GET - do */
+struct ethtool_tsconfig_get_req {
+	std::optional<ethtool_header> header;
+};
+
+struct ethtool_tsconfig_get_rsp {
+	std::optional<ethtool_header> header;
+	std::optional<ethtool_ts_hwtstamp_provider> hwtstamp_provider;
+	std::optional<ethtool_bitset> tx_types;
+	std::optional<ethtool_bitset> rx_filters;
+	std::optional<__u32> hwtstamp_flags;
+};
+
+/*
+ * Get hwtstamp config.
+ */
+std::unique_ptr<ethtool_tsconfig_get_rsp>
+ethtool_tsconfig_get(ynl_cpp::ynl_socket&  ys, ethtool_tsconfig_get_req& req);
+
+/* ETHTOOL_MSG_TSCONFIG_GET - dump */
+struct ethtool_tsconfig_get_req_dump {
+	std::optional<ethtool_header> header;
+};
+
+struct ethtool_tsconfig_get_list {
+	std::list<ethtool_tsconfig_get_rsp> objs;
+};
+
+std::unique_ptr<ethtool_tsconfig_get_list>
+ethtool_tsconfig_get_dump(ynl_cpp::ynl_socket&  ys,
+			  ethtool_tsconfig_get_req_dump& req);
+
+/* ============== ETHTOOL_MSG_TSCONFIG_SET ============== */
+/* ETHTOOL_MSG_TSCONFIG_SET - do */
+struct ethtool_tsconfig_set_req {
+	std::optional<ethtool_header> header;
+	std::optional<ethtool_ts_hwtstamp_provider> hwtstamp_provider;
+	std::optional<ethtool_bitset> tx_types;
+	std::optional<ethtool_bitset> rx_filters;
+	std::optional<__u32> hwtstamp_flags;
+};
+
+struct ethtool_tsconfig_set_rsp {
+	std::optional<ethtool_header> header;
+	std::optional<ethtool_ts_hwtstamp_provider> hwtstamp_provider;
+	std::optional<ethtool_bitset> tx_types;
+	std::optional<ethtool_bitset> rx_filters;
+	std::optional<__u32> hwtstamp_flags;
+};
+
+/*
+ * Set hwtstamp config.
+ */
+std::unique_ptr<ethtool_tsconfig_set_rsp>
+ethtool_tsconfig_set(ynl_cpp::ynl_socket&  ys, ethtool_tsconfig_set_req& req);
 
 /* ETHTOOL_MSG_CABLE_TEST_NTF - event */
 struct ethtool_cable_test_ntf_rsp {

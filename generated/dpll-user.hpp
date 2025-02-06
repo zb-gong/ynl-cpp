@@ -29,6 +29,7 @@ std::string_view dpll_op_str(int op);
 std::string_view dpll_mode_str(dpll_mode value);
 std::string_view dpll_lock_status_str(dpll_lock_status value);
 std::string_view dpll_lock_status_error_str(dpll_lock_status_error value);
+std::string_view dpll_clock_quality_level_str(dpll_clock_quality_level value);
 std::string_view dpll_type_str(dpll_type value);
 std::string_view dpll_pin_type_str(dpll_pin_type value);
 std::string_view dpll_pin_direction_str(dpll_pin_direction value);

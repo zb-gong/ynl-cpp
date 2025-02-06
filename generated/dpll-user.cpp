@@ -84,6 +84,26 @@ std::string_view dpll_lock_status_error_str(dpll_lock_status_error value)
 	return dpll_lock_status_error_strmap[value];
 }
 
+static constexpr std::array<std::string_view, 8 + 1> dpll_clock_quality_level_strmap = []() {
+	std::array<std::string_view, 8 + 1> arr{};
+	arr[1] = "itu-opt1-prc";
+	arr[2] = "itu-opt1-ssu-a";
+	arr[3] = "itu-opt1-ssu-b";
+	arr[4] = "itu-opt1-eec1";
+	arr[5] = "itu-opt1-prtc";
+	arr[6] = "itu-opt1-eprtc";
+	arr[7] = "itu-opt1-eeec";
+	arr[8] = "itu-opt1-eprc";
+	return arr;
+} ();
+
+std::string_view dpll_clock_quality_level_str(dpll_clock_quality_level value)
+{
+	if (value < 0 || value >= (int)(dpll_clock_quality_level_strmap.size()))
+		return "";
+	return dpll_clock_quality_level_strmap[value];
+}
+
 static constexpr std::array<std::string_view, 2 + 1> dpll_type_strmap = []() {
 	std::array<std::string_view, 2 + 1> arr{};
 	arr[1] = "pps";
@@ -212,6 +232,7 @@ static std::array<ynl_policy_attr,DPLL_A_MAX + 1> dpll_policy = []() {
 	arr[DPLL_A_TEMP] = { .name = "temp", .type = YNL_PT_U32, };
 	arr[DPLL_A_TYPE] = { .name = "type", .type = YNL_PT_U32, };
 	arr[DPLL_A_LOCK_STATUS_ERROR] = { .name = "lock-status-error", .type = YNL_PT_U32, };
+	arr[DPLL_A_CLOCK_QUALITY_LEVEL] = { .name = "clock-quality-level", .type = YNL_PT_U32, };
 	return arr;
 } ();
 

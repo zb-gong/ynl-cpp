@@ -93,7 +93,7 @@ struct mptcp_pm_flush_addrs_req {
 };
 
 /*
- * flush addresses
+ * Flush addresses
  */
 int mptcp_pm_flush_addrs(ynl_cpp::ynl_socket&  ys,
 			 mptcp_pm_flush_addrs_req& req);
@@ -149,7 +149,7 @@ struct mptcp_pm_announce_req {
 };
 
 /*
- * announce new sf
+ * Announce new address
  */
 int mptcp_pm_announce(ynl_cpp::ynl_socket&  ys, mptcp_pm_announce_req& req);
 
@@ -161,7 +161,7 @@ struct mptcp_pm_remove_req {
 };
 
 /*
- * announce removal
+ * Announce removal
  */
 int mptcp_pm_remove(ynl_cpp::ynl_socket&  ys, mptcp_pm_remove_req& req);
 
@@ -174,7 +174,7 @@ struct mptcp_pm_subflow_create_req {
 };
 
 /*
- * todo
+ * Create subflow
  */
 int mptcp_pm_subflow_create(ynl_cpp::ynl_socket&  ys,
 			    mptcp_pm_subflow_create_req& req);
@@ -188,7 +188,7 @@ struct mptcp_pm_subflow_destroy_req {
 };
 
 /*
- * todo
+ * Destroy subflow
  */
 int mptcp_pm_subflow_destroy(ynl_cpp::ynl_socket&  ys,
 			     mptcp_pm_subflow_destroy_req& req);
