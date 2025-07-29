@@ -31,6 +31,7 @@ std::string_view netdev_xdp_rx_metadata_str(netdev_xdp_rx_metadata value);
 std::string_view netdev_xsk_flags_str(netdev_xsk_flags value);
 std::string_view netdev_queue_type_str(netdev_queue_type value);
 std::string_view netdev_qstats_scope_str(netdev_qstats_scope value);
+std::string_view netdev_napi_threaded_str(netdev_napi_threaded value);
 
 /* Common nested types */
 struct netdev_io_uring_provider_info {
@@ -204,6 +205,7 @@ struct netdev_napi_get_rsp {
 	std::optional<__u32> defer_hard_irqs;
 	std::optional<__u64> gro_flush_timeout;
 	std::optional<__u64> irq_suspend_timeout;
+	std::optional<enum netdev_napi_threaded> threaded;
 };
 
 /*
@@ -274,6 +276,7 @@ struct netdev_napi_set_req {
 	std::optional<__u32> defer_hard_irqs;
 	std::optional<__u64> gro_flush_timeout;
 	std::optional<__u64> irq_suspend_timeout;
+	std::optional<enum netdev_napi_threaded> threaded;
 };
 
 /*

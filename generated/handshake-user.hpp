@@ -50,6 +50,7 @@ struct handshake_accept_rsp {
 	std::vector<__u32> peer_identity;
 	std::vector<handshake_x509> certificate;
 	std::string peername;
+	std::optional<__u32> keyring;
 };
 
 /*

@@ -9,6 +9,7 @@
 #include "ethtool-user.hpp"
 
 #include <iostream>
+#include <cstdint>
 
 #define YNL_OSTREAM_OPTIONAL_VAL(rsp, name)                      \
   if (rsp.name.has_value()) {                                    \

@@ -109,6 +109,8 @@ static std::array<ynl_policy_attr,HANDSHAKE_A_ACCEPT_MAX + 1> handshake_accept_p
 	arr[HANDSHAKE_A_ACCEPT_CERTIFICATE].nest = &handshake_x509_nest;
 	arr[HANDSHAKE_A_ACCEPT_PEERNAME].name = "peername";
 	arr[HANDSHAKE_A_ACCEPT_PEERNAME].type  = YNL_PT_NUL_STR;
+	arr[HANDSHAKE_A_ACCEPT_KEYRING].name = "keyring";
+	arr[HANDSHAKE_A_ACCEPT_KEYRING].type = YNL_PT_U32;
 	return arr;
 } ();
 
@@ -204,6 +206,10 @@ int handshake_accept_rsp_parse(const struct nlmsghdr *nlh,
 			if (ynl_attr_validate(yarg, attr))
 				return YNL_PARSE_CB_ERROR;
 			dst->peername.assign(ynl_attr_get_str(attr));
+		} else if (type == HANDSHAKE_A_ACCEPT_KEYRING) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->keyring = (__u32)ynl_attr_get_u32(attr);
 		}
 	}
 

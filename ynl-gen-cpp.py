@@ -286,11 +286,14 @@ class TypeScalar(Type):
         if "enum" in self.attr:
             enum = self.family.consts[self.attr["enum"]]
             low, high = enum.value_range()
-            if "min" not in self.checks:
-                if low != 0 or self.type[0] == "s":
-                    self.checks["min"] = low
-            if "max" not in self.checks:
-                self.checks["max"] = high
+            if low == None and high == None:
+                self.checks['sparse'] = True
+            else:
+                if "min" not in self.checks:
+                    if low != 0 or self.type[0] == "s":
+                        self.checks["min"] = low
+                if "max" not in self.checks:
+                    self.checks["max"] = high
 
         if "min" in self.checks and "max" in self.checks:
             if self.get_limit("min") > self.get_limit("max"):
@@ -810,7 +813,7 @@ class EnumSet(SpecEnumSet):
         high = max([x.value for x in self.entries.values()])
 
         if high - low + 1 != len(self.entries):
-            raise Exception("Can't get value range for a noncontiguous enum")
+            return None, None
 
         return low, high
 

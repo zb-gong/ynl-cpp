@@ -24,6 +24,8 @@
 #include <linux/ethtool.h>
 #include <linux/ethtool.h>
 #include <linux/ethtool.h>
+#include <linux/ethtool.h>
+#include <linux/ethtool.h>
 
 namespace ynl_cpp {
 const struct ynl_family& get_ynl_ethtool_family();
@@ -41,6 +43,8 @@ std::string_view ethtool_phy_upstream_type_str(phy_upstream value);
 std::string_view ethtool_tcp_data_split_str(ethtool_tcp_data_split value);
 std::string_view ethtool_hwtstamp_source_str(hwtstamp_source value);
 std::string_view ethtool_pse_event_str(ethtool_pse_event value);
+std::string_view ethtool_input_xfrm_str(int value);
+std::string_view ethtool_rxfh_fields_str(int value);
 
 /* Common nested types */
 struct ethtool_header {
@@ -83,6 +87,36 @@ struct ethtool_fec_stat {
 struct ethtool_c33_pse_pw_limit {
 	std::optional<__u32> min;
 	std::optional<__u32> max;
+};
+
+struct ethtool_flow {
+	std::optional<__u64> ether;
+	std::optional<__u64> ip4;
+	std::optional<__u64> ip6;
+	std::optional<__u64> tcp4;
+	std::optional<__u64> tcp6;
+	std::optional<__u64> udp4;
+	std::optional<__u64> udp6;
+	std::optional<__u64> sctp4;
+	std::optional<__u64> sctp6;
+	std::optional<__u64> ah4;
+	std::optional<__u64> ah6;
+	std::optional<__u64> esp4;
+	std::optional<__u64> esp6;
+	std::optional<__u64> ah_esp4;
+	std::optional<__u64> ah_esp6;
+	std::optional<__u64> gtpu4;
+	std::optional<__u64> gtpu6;
+	std::optional<__u64> gtpc4;
+	std::optional<__u64> gtpc6;
+	std::optional<__u64> gtpc_teid4;
+	std::optional<__u64> gtpc_teid6;
+	std::optional<__u64> gtpu_eh4;
+	std::optional<__u64> gtpu_eh6;
+	std::optional<__u64> gtpu_ul4;
+	std::optional<__u64> gtpu_ul6;
+	std::optional<__u64> gtpu_dl4;
+	std::optional<__u64> gtpu_dl6;
 };
 
 struct ethtool_mm_stat {
@@ -1078,15 +1112,15 @@ int ethtool_fec_set(ynl_cpp::ynl_socket&  ys, ethtool_fec_set_req& req);
 /* ETHTOOL_MSG_MODULE_EEPROM_GET - do */
 struct ethtool_module_eeprom_get_req {
 	std::optional<ethtool_header> header;
-};
-
-struct ethtool_module_eeprom_get_rsp {
-	std::optional<ethtool_header> header;
 	std::optional<__u32> offset;
 	std::optional<__u32> length;
 	std::optional<__u8> page;
 	std::optional<__u8> bank;
 	std::optional<__u8> i2c_address;
+};
+
+struct ethtool_module_eeprom_get_rsp {
+	std::optional<ethtool_header> header;
 	std::vector<__u8> data;
 };
 
@@ -1100,6 +1134,11 @@ ethtool_module_eeprom_get(ynl_cpp::ynl_socket&  ys,
 /* ETHTOOL_MSG_MODULE_EEPROM_GET - dump */
 struct ethtool_module_eeprom_get_req_dump {
 	std::optional<ethtool_header> header;
+	std::optional<__u32> offset;
+	std::optional<__u32> length;
+	std::optional<__u8> page;
+	std::optional<__u8> bank;
+	std::optional<__u8> i2c_address;
 };
 
 struct ethtool_module_eeprom_get_list {
@@ -1295,6 +1334,7 @@ struct ethtool_rss_get_rsp {
 	std::vector<__u8> indir;
 	std::vector<__u8> hkey;
 	std::optional<__u32> input_xfrm;
+	std::optional<ethtool_flow> flow_hash;
 };
 
 /*
@@ -1586,6 +1626,67 @@ struct ethtool_tsconfig_set_rsp {
 std::unique_ptr<ethtool_tsconfig_set_rsp>
 ethtool_tsconfig_set(ynl_cpp::ynl_socket&  ys, ethtool_tsconfig_set_req& req);
 
+/* ============== ETHTOOL_MSG_RSS_SET ============== */
+/* ETHTOOL_MSG_RSS_SET - do */
+struct ethtool_rss_set_req {
+	std::optional<ethtool_header> header;
+	std::optional<__u32> context;
+	std::optional<__u32> hfunc;
+	std::vector<__u8> indir;
+	std::vector<__u8> hkey;
+	std::optional<__u32> input_xfrm;
+	std::optional<ethtool_flow> flow_hash;
+};
+
+/*
+ * Set RSS params.
+ */
+int ethtool_rss_set(ynl_cpp::ynl_socket&  ys, ethtool_rss_set_req& req);
+
+/* ============== ETHTOOL_MSG_RSS_CREATE_ACT ============== */
+/* ETHTOOL_MSG_RSS_CREATE_ACT - do */
+struct ethtool_rss_create_act_req {
+	std::optional<ethtool_header> header;
+	std::optional<__u32> context;
+	std::optional<__u32> hfunc;
+	std::vector<__u8> indir;
+	std::vector<__u8> hkey;
+	std::optional<__u32> input_xfrm;
+};
+
+struct ethtool_rss_create_act_rsp {
+	std::optional<ethtool_header> header;
+	std::optional<__u32> context;
+	std::optional<__u32> hfunc;
+	std::vector<__u8> indir;
+	std::vector<__u8> hkey;
+	std::optional<__u32> input_xfrm;
+};
+
+/*
+ * Create an RSS context.
+ */
+std::unique_ptr<ethtool_rss_create_act_rsp>
+ethtool_rss_create_act(ynl_cpp::ynl_socket&  ys,
+		       ethtool_rss_create_act_req& req);
+
+/* ETHTOOL_MSG_RSS_CREATE_ACT - notify */
+struct ethtool_rss_create_act_ntf {
+};
+
+/* ============== ETHTOOL_MSG_RSS_DELETE_ACT ============== */
+/* ETHTOOL_MSG_RSS_DELETE_ACT - do */
+struct ethtool_rss_delete_act_req {
+	std::optional<ethtool_header> header;
+	std::optional<__u32> context;
+};
+
+/*
+ * Delete an RSS context.
+ */
+int ethtool_rss_delete_act(ynl_cpp::ynl_socket&  ys,
+			   ethtool_rss_delete_act_req& req);
+
 /* ETHTOOL_MSG_CABLE_TEST_NTF - event */
 struct ethtool_cable_test_ntf_rsp {
 	std::optional<ethtool_header> header;
@@ -1624,6 +1725,15 @@ struct ethtool_pse_ntf_rsp {
 };
 
 struct ethtool_pse_ntf {
+};
+
+/* ETHTOOL_MSG_RSS_DELETE_NTF - event */
+struct ethtool_rss_delete_ntf_rsp {
+	std::optional<ethtool_header> header;
+	std::optional<__u32> context;
+};
+
+struct ethtool_rss_delete_ntf {
 };
 
 } //namespace ynl_cpp

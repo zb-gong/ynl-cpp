@@ -121,6 +121,20 @@ std::string_view netdev_qstats_scope_str(netdev_qstats_scope value)
 	return netdev_qstats_scope_strmap[value];
 }
 
+static constexpr std::array<std::string_view, 1 + 1> netdev_napi_threaded_strmap = []() {
+	std::array<std::string_view, 1 + 1> arr{};
+	arr[0] = "disabled";
+	arr[1] = "enabled";
+	return arr;
+} ();
+
+std::string_view netdev_napi_threaded_str(netdev_napi_threaded value)
+{
+	if (value < 0 || value >= (int)(netdev_napi_threaded_strmap.size()))
+		return "";
+	return netdev_napi_threaded_strmap[value];
+}
+
 /* Policies */
 static std::array<ynl_policy_attr,NETDEV_A_IO_URING_PROVIDER_INFO_MAX + 1> netdev_io_uring_provider_info_policy = []() {
 	std::array<ynl_policy_attr,NETDEV_A_IO_URING_PROVIDER_INFO_MAX + 1> arr{};
@@ -296,6 +310,8 @@ static std::array<ynl_policy_attr,NETDEV_A_NAPI_MAX + 1> netdev_napi_policy = []
 	arr[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT].type = YNL_PT_UINT;
 	arr[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT].name = "irq-suspend-timeout";
 	arr[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT].type = YNL_PT_UINT;
+	arr[NETDEV_A_NAPI_THREADED].name = "threaded";
+	arr[NETDEV_A_NAPI_THREADED].type = YNL_PT_U32;
 	return arr;
 } ();
 
@@ -961,6 +977,10 @@ int netdev_napi_get_rsp_parse(const struct nlmsghdr *nlh,
 			if (ynl_attr_validate(yarg, attr))
 				return YNL_PARSE_CB_ERROR;
 			dst->irq_suspend_timeout = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == NETDEV_A_NAPI_THREADED) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->threaded = (enum netdev_napi_threaded)ynl_attr_get_u32(attr);
 		}
 	}
 
@@ -1174,6 +1194,8 @@ int netdev_napi_set(ynl_cpp::ynl_socket&  ys, netdev_napi_set_req& req)
 		ynl_attr_put_uint(nlh, NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT, req.gro_flush_timeout.value());
 	if (req.irq_suspend_timeout.has_value())
 		ynl_attr_put_uint(nlh, NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT, req.irq_suspend_timeout.value());
+	if (req.threaded.has_value())
+		ynl_attr_put_u32(nlh, NETDEV_A_NAPI_THREADED, req.threaded.value());
 
 	err = ynl_exec(ys, nlh, &yrs);
 	if (err < 0)

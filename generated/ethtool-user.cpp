@@ -12,14 +12,16 @@
 #include <linux/ethtool.h>
 #include <linux/ethtool.h>
 #include <linux/ethtool.h>
+#include <linux/ethtool.h>
+#include <linux/ethtool.h>
 
 #include <linux/genetlink.h>
 
 namespace ynl_cpp {
 
 /* Enums */
-static constexpr std::array<std::string_view, 50 + 1> ethtool_op_strmap = []() {
-	std::array<std::string_view, 50 + 1> arr{};
+static constexpr std::array<std::string_view, 53 + 1> ethtool_op_strmap = []() {
+	std::array<std::string_view, 53 + 1> arr{};
 	arr[ETHTOOL_MSG_STRSET_GET] = "strset-get";
 	arr[ETHTOOL_MSG_LINKINFO_GET] = "linkinfo-get";
 	arr[3] = "linkinfo-ntf";
@@ -70,6 +72,9 @@ static constexpr std::array<std::string_view, 50 + 1> ethtool_op_strmap = []() {
 	arr[48] = "tsconfig-set";
 	arr[49] = "pse-ntf";
 	arr[50] = "rss-ntf";
+	arr[51] = "rss-create-act";
+	arr[52] = "rss-create-ntf";
+	arr[53] = "rss-delete-ntf";
 	return arr;
 } ();
 
@@ -224,6 +229,43 @@ std::string_view ethtool_pse_event_str(ethtool_pse_event value)
 	return ethtool_pse_event_strmap[value];
 }
 
+static constexpr std::array<std::string_view, 1 + 1> ethtool_input_xfrm_strmap = []() {
+	std::array<std::string_view, 1 + 1> arr{};
+	arr[0] = "sym-xor";
+	arr[1] = "sym-or-xor";
+	return arr;
+} ();
+
+std::string_view ethtool_input_xfrm_str(int value)
+{
+	value = (int)(ffs(value) - 1);
+	if (value < 0 || value >= (int)(ethtool_input_xfrm_strmap.size()))
+		return "";
+	return ethtool_input_xfrm_strmap[value];
+}
+
+static constexpr std::array<std::string_view, 31 + 1> ethtool_rxfh_fields_strmap = []() {
+	std::array<std::string_view, 31 + 1> arr{};
+	arr[1] = "l2da";
+	arr[2] = "vlan";
+	arr[3] = "l3-proto";
+	arr[4] = "ip-src";
+	arr[5] = "ip-dst";
+	arr[6] = "l4-b-0-1";
+	arr[7] = "l4-b-2-3";
+	arr[8] = "gtp-teid";
+	arr[31] = "discard";
+	return arr;
+} ();
+
+std::string_view ethtool_rxfh_fields_str(int value)
+{
+	value = (int)(ffs(value) - 1);
+	if (value < 0 || value >= (int)(ethtool_rxfh_fields_strmap.size()))
+		return "";
+	return ethtool_rxfh_fields_strmap[value];
+}
+
 /* Policies */
 static std::array<ynl_policy_attr,ETHTOOL_A_HEADER_MAX + 1> ethtool_header_policy = []() {
 	std::array<ynl_policy_attr,ETHTOOL_A_HEADER_MAX + 1> arr{};
@@ -353,6 +395,70 @@ static std::array<ynl_policy_attr,__ETHTOOL_A_C33_PSE_PW_LIMIT_MAX + 1> ethtool_
 struct ynl_policy_nest ethtool_c33_pse_pw_limit_nest = {
 	.max_attr = static_cast<unsigned int>(__ETHTOOL_A_C33_PSE_PW_LIMIT_MAX),
 	.table = ethtool_c33_pse_pw_limit_policy.data(),
+};
+
+static std::array<ynl_policy_attr,ETHTOOL_A_FLOW_MAX + 1> ethtool_flow_policy = []() {
+	std::array<ynl_policy_attr,ETHTOOL_A_FLOW_MAX + 1> arr{};
+	arr[ETHTOOL_A_FLOW_ETHER].name = "ether";
+	arr[ETHTOOL_A_FLOW_ETHER].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_IP4].name = "ip4";
+	arr[ETHTOOL_A_FLOW_IP4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_IP6].name = "ip6";
+	arr[ETHTOOL_A_FLOW_IP6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_TCP4].name = "tcp4";
+	arr[ETHTOOL_A_FLOW_TCP4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_TCP6].name = "tcp6";
+	arr[ETHTOOL_A_FLOW_TCP6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_UDP4].name = "udp4";
+	arr[ETHTOOL_A_FLOW_UDP4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_UDP6].name = "udp6";
+	arr[ETHTOOL_A_FLOW_UDP6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_SCTP4].name = "sctp4";
+	arr[ETHTOOL_A_FLOW_SCTP4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_SCTP6].name = "sctp6";
+	arr[ETHTOOL_A_FLOW_SCTP6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_AH4].name = "ah4";
+	arr[ETHTOOL_A_FLOW_AH4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_AH6].name = "ah6";
+	arr[ETHTOOL_A_FLOW_AH6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_ESP4].name = "esp4";
+	arr[ETHTOOL_A_FLOW_ESP4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_ESP6].name = "esp6";
+	arr[ETHTOOL_A_FLOW_ESP6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_AH_ESP4].name = "ah-esp4";
+	arr[ETHTOOL_A_FLOW_AH_ESP4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_AH_ESP6].name = "ah-esp6";
+	arr[ETHTOOL_A_FLOW_AH_ESP6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPU4].name = "gtpu4";
+	arr[ETHTOOL_A_FLOW_GTPU4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPU6].name = "gtpu6";
+	arr[ETHTOOL_A_FLOW_GTPU6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPC4].name = "gtpc4";
+	arr[ETHTOOL_A_FLOW_GTPC4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPC6].name = "gtpc6";
+	arr[ETHTOOL_A_FLOW_GTPC6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPC_TEID4].name = "gtpc-teid4";
+	arr[ETHTOOL_A_FLOW_GTPC_TEID4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPC_TEID6].name = "gtpc-teid6";
+	arr[ETHTOOL_A_FLOW_GTPC_TEID6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPU_EH4].name = "gtpu-eh4";
+	arr[ETHTOOL_A_FLOW_GTPU_EH4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPU_EH6].name = "gtpu-eh6";
+	arr[ETHTOOL_A_FLOW_GTPU_EH6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPU_UL4].name = "gtpu-ul4";
+	arr[ETHTOOL_A_FLOW_GTPU_UL4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPU_UL6].name = "gtpu-ul6";
+	arr[ETHTOOL_A_FLOW_GTPU_UL6].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPU_DL4].name = "gtpu-dl4";
+	arr[ETHTOOL_A_FLOW_GTPU_DL4].type = YNL_PT_UINT;
+	arr[ETHTOOL_A_FLOW_GTPU_DL6].name = "gtpu-dl6";
+	arr[ETHTOOL_A_FLOW_GTPU_DL6].type = YNL_PT_UINT;
+	return arr;
+} ();
+
+struct ynl_policy_nest ethtool_flow_nest = {
+	.max_attr = static_cast<unsigned int>(ETHTOOL_A_FLOW_MAX),
+	.table = ethtool_flow_policy.data(),
 };
 
 static std::array<ynl_policy_attr,ETHTOOL_A_MM_STAT_MAX + 1> ethtool_mm_stat_policy = []() {
@@ -1395,6 +1501,9 @@ static std::array<ynl_policy_attr,ETHTOOL_A_RSS_MAX + 1> ethtool_rss_policy = []
 	arr[ETHTOOL_A_RSS_INPUT_XFRM].type = YNL_PT_U32;
 	arr[ETHTOOL_A_RSS_START_CONTEXT].name = "start-context";
 	arr[ETHTOOL_A_RSS_START_CONTEXT].type = YNL_PT_U32;
+	arr[ETHTOOL_A_RSS_FLOW_HASH].name = "flow-hash";
+	arr[ETHTOOL_A_RSS_FLOW_HASH].type = YNL_PT_NEST;
+	arr[ETHTOOL_A_RSS_FLOW_HASH].nest = &ethtool_flow_nest;
 	return arr;
 } ();
 
@@ -1794,6 +1903,193 @@ int ethtool_c33_pse_pw_limit_parse(struct ynl_parse_arg *yarg,
 			if (ynl_attr_validate(yarg, attr))
 				return YNL_PARSE_CB_ERROR;
 			dst->max = (__u32)ynl_attr_get_u32(attr);
+		}
+	}
+
+	return 0;
+}
+
+int ethtool_flow_put(struct nlmsghdr *nlh, unsigned int attr_type,
+		     const ethtool_flow&  obj)
+{
+	struct nlattr *nest;
+
+	nest = ynl_attr_nest_start(nlh, attr_type);
+	if (obj.ether.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_ETHER, obj.ether.value());
+	if (obj.ip4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_IP4, obj.ip4.value());
+	if (obj.ip6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_IP6, obj.ip6.value());
+	if (obj.tcp4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_TCP4, obj.tcp4.value());
+	if (obj.tcp6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_TCP6, obj.tcp6.value());
+	if (obj.udp4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_UDP4, obj.udp4.value());
+	if (obj.udp6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_UDP6, obj.udp6.value());
+	if (obj.sctp4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_SCTP4, obj.sctp4.value());
+	if (obj.sctp6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_SCTP6, obj.sctp6.value());
+	if (obj.ah4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_AH4, obj.ah4.value());
+	if (obj.ah6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_AH6, obj.ah6.value());
+	if (obj.esp4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_ESP4, obj.esp4.value());
+	if (obj.esp6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_ESP6, obj.esp6.value());
+	if (obj.ah_esp4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_AH_ESP4, obj.ah_esp4.value());
+	if (obj.ah_esp6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_AH_ESP6, obj.ah_esp6.value());
+	if (obj.gtpu4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPU4, obj.gtpu4.value());
+	if (obj.gtpu6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPU6, obj.gtpu6.value());
+	if (obj.gtpc4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPC4, obj.gtpc4.value());
+	if (obj.gtpc6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPC6, obj.gtpc6.value());
+	if (obj.gtpc_teid4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPC_TEID4, obj.gtpc_teid4.value());
+	if (obj.gtpc_teid6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPC_TEID6, obj.gtpc_teid6.value());
+	if (obj.gtpu_eh4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPU_EH4, obj.gtpu_eh4.value());
+	if (obj.gtpu_eh6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPU_EH6, obj.gtpu_eh6.value());
+	if (obj.gtpu_ul4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPU_UL4, obj.gtpu_ul4.value());
+	if (obj.gtpu_ul6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPU_UL6, obj.gtpu_ul6.value());
+	if (obj.gtpu_dl4.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPU_DL4, obj.gtpu_dl4.value());
+	if (obj.gtpu_dl6.has_value())
+		ynl_attr_put_uint(nlh, ETHTOOL_A_FLOW_GTPU_DL6, obj.gtpu_dl6.value());
+	ynl_attr_nest_end(nlh, nest);
+
+	return 0;
+}
+
+int ethtool_flow_parse(struct ynl_parse_arg *yarg, const struct nlattr *nested)
+{
+	ethtool_flow *dst = (ethtool_flow *)yarg->data;
+	const struct nlattr *attr;
+
+	ynl_attr_for_each_nested(attr, nested) {
+		unsigned int type = ynl_attr_type(attr);
+
+		if (type == ETHTOOL_A_FLOW_ETHER) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->ether = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_IP4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->ip4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_IP6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->ip6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_TCP4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->tcp4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_TCP6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->tcp6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_UDP4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->udp4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_UDP6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->udp6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_SCTP4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->sctp4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_SCTP6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->sctp6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_AH4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->ah4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_AH6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->ah6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_ESP4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->esp4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_ESP6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->esp6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_AH_ESP4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->ah_esp4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_AH_ESP6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->ah_esp6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPU4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpu4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPU6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpu6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPC4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpc4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPC6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpc6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPC_TEID4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpc_teid4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPC_TEID6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpc_teid6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPU_EH4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpu_eh4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPU_EH6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpu_eh6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPU_UL4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpu_ul4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPU_UL6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpu_ul6 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPU_DL4) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpu_dl4 = (__u64)ynl_attr_get_uint(attr);
+		} else if (type == ETHTOOL_A_FLOW_GTPU_DL6) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->gtpu_dl6 = (__u64)ynl_attr_get_uint(attr);
 		}
 	}
 
@@ -5068,26 +5364,6 @@ int ethtool_module_eeprom_get_rsp_parse(const struct nlmsghdr *nlh,
 			parg.data = &dst->header;
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
-		} else if (type == ETHTOOL_A_MODULE_EEPROM_OFFSET) {
-			if (ynl_attr_validate(yarg, attr))
-				return YNL_PARSE_CB_ERROR;
-			dst->offset = (__u32)ynl_attr_get_u32(attr);
-		} else if (type == ETHTOOL_A_MODULE_EEPROM_LENGTH) {
-			if (ynl_attr_validate(yarg, attr))
-				return YNL_PARSE_CB_ERROR;
-			dst->length = (__u32)ynl_attr_get_u32(attr);
-		} else if (type == ETHTOOL_A_MODULE_EEPROM_PAGE) {
-			if (ynl_attr_validate(yarg, attr))
-				return YNL_PARSE_CB_ERROR;
-			dst->page = (__u8)ynl_attr_get_u8(attr);
-		} else if (type == ETHTOOL_A_MODULE_EEPROM_BANK) {
-			if (ynl_attr_validate(yarg, attr))
-				return YNL_PARSE_CB_ERROR;
-			dst->bank = (__u8)ynl_attr_get_u8(attr);
-		} else if (type == ETHTOOL_A_MODULE_EEPROM_I2C_ADDRESS) {
-			if (ynl_attr_validate(yarg, attr))
-				return YNL_PARSE_CB_ERROR;
-			dst->i2c_address = (__u8)ynl_attr_get_u8(attr);
 		} else if (type == ETHTOOL_A_MODULE_EEPROM_DATA) {
 			if (ynl_attr_validate(yarg, attr))
 				return YNL_PARSE_CB_ERROR;
@@ -5115,6 +5391,16 @@ ethtool_module_eeprom_get(ynl_cpp::ynl_socket&  ys,
 
 	if (req.header.has_value())
 		ethtool_header_put(nlh, ETHTOOL_A_MODULE_EEPROM_HEADER, req.header.value());
+	if (req.offset.has_value())
+		ynl_attr_put_u32(nlh, ETHTOOL_A_MODULE_EEPROM_OFFSET, req.offset.value());
+	if (req.length.has_value())
+		ynl_attr_put_u32(nlh, ETHTOOL_A_MODULE_EEPROM_LENGTH, req.length.value());
+	if (req.page.has_value())
+		ynl_attr_put_u8(nlh, ETHTOOL_A_MODULE_EEPROM_PAGE, req.page.value());
+	if (req.bank.has_value())
+		ynl_attr_put_u8(nlh, ETHTOOL_A_MODULE_EEPROM_BANK, req.bank.value());
+	if (req.i2c_address.has_value())
+		ynl_attr_put_u8(nlh, ETHTOOL_A_MODULE_EEPROM_I2C_ADDRESS, req.i2c_address.value());
 
 	rsp.reset(new ethtool_module_eeprom_get_rsp());
 	yrs.yarg.data = rsp.get();
@@ -5150,6 +5436,16 @@ ethtool_module_eeprom_get_dump(ynl_cpp::ynl_socket&  ys,
 
 	if (req.header.has_value())
 		ethtool_header_put(nlh, ETHTOOL_A_MODULE_EEPROM_HEADER, req.header.value());
+	if (req.offset.has_value())
+		ynl_attr_put_u32(nlh, ETHTOOL_A_MODULE_EEPROM_OFFSET, req.offset.value());
+	if (req.length.has_value())
+		ynl_attr_put_u32(nlh, ETHTOOL_A_MODULE_EEPROM_LENGTH, req.length.value());
+	if (req.page.has_value())
+		ynl_attr_put_u8(nlh, ETHTOOL_A_MODULE_EEPROM_PAGE, req.page.value());
+	if (req.bank.has_value())
+		ynl_attr_put_u8(nlh, ETHTOOL_A_MODULE_EEPROM_BANK, req.bank.value());
+	if (req.i2c_address.has_value())
+		ynl_attr_put_u8(nlh, ETHTOOL_A_MODULE_EEPROM_I2C_ADDRESS, req.i2c_address.value());
 
 	err = ynl_exec_dump_no_alloc(ys, nlh, &yds);
 	if (err < 0)
@@ -5717,6 +6013,14 @@ int ethtool_rss_get_rsp_parse(const struct nlmsghdr *nlh,
 			if (ynl_attr_validate(yarg, attr))
 				return YNL_PARSE_CB_ERROR;
 			dst->input_xfrm = (__u32)ynl_attr_get_u32(attr);
+		} else if (type == ETHTOOL_A_RSS_FLOW_HASH) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+
+			parg.rsp_policy = &ethtool_flow_nest;
+			parg.data = &dst->flow_hash;
+			if (ethtool_flow_parse(&parg, attr))
+				return YNL_PARSE_CB_ERROR;
 		}
 	}
 
@@ -6571,6 +6875,155 @@ ethtool_tsconfig_set(ynl_cpp::ynl_socket&  ys, ethtool_tsconfig_set_req& req)
 	return rsp;
 }
 
+/* ============== ETHTOOL_MSG_RSS_SET ============== */
+/* ETHTOOL_MSG_RSS_SET - do */
+int ethtool_rss_set(ynl_cpp::ynl_socket&  ys, ethtool_rss_set_req& req)
+{
+	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
+	struct nlmsghdr *nlh;
+	int err;
+
+	nlh = ynl_gemsg_start_req(ys, ((struct ynl_sock*)ys)->family_id, ETHTOOL_MSG_RSS_SET, 1);
+	((struct ynl_sock*)ys)->req_policy = &ethtool_rss_nest;
+
+	if (req.header.has_value())
+		ethtool_header_put(nlh, ETHTOOL_A_RSS_HEADER, req.header.value());
+	if (req.context.has_value())
+		ynl_attr_put_u32(nlh, ETHTOOL_A_RSS_CONTEXT, req.context.value());
+	if (req.hfunc.has_value())
+		ynl_attr_put_u32(nlh, ETHTOOL_A_RSS_HFUNC, req.hfunc.value());
+	if (req.indir.size() > 0)
+		ynl_attr_put(nlh, ETHTOOL_A_RSS_INDIR, req.indir.data(), req.indir.size());
+	if (req.hkey.size() > 0)
+		ynl_attr_put(nlh, ETHTOOL_A_RSS_HKEY, req.hkey.data(), req.hkey.size());
+	if (req.input_xfrm.has_value())
+		ynl_attr_put_u32(nlh, ETHTOOL_A_RSS_INPUT_XFRM, req.input_xfrm.value());
+	if (req.flow_hash.has_value())
+		ethtool_flow_put(nlh, ETHTOOL_A_RSS_FLOW_HASH, req.flow_hash.value());
+
+	err = ynl_exec(ys, nlh, &yrs);
+	if (err < 0)
+		return -1;
+
+	return 0;
+}
+
+/* ============== ETHTOOL_MSG_RSS_CREATE_ACT ============== */
+/* ETHTOOL_MSG_RSS_CREATE_ACT - do */
+int ethtool_rss_create_act_rsp_parse(const struct nlmsghdr *nlh,
+				     struct ynl_parse_arg *yarg)
+{
+	ethtool_rss_create_act_rsp *dst;
+	const struct nlattr *attr;
+	struct ynl_parse_arg parg;
+
+	dst = (ethtool_rss_create_act_rsp*)yarg->data;
+	parg.ys = yarg->ys;
+
+	ynl_attr_for_each(attr, nlh, yarg->ys->family->hdr_len) {
+		unsigned int type = ynl_attr_type(attr);
+
+		if (type == ETHTOOL_A_RSS_HEADER) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+
+			parg.rsp_policy = &ethtool_header_nest;
+			parg.data = &dst->header;
+			if (ethtool_header_parse(&parg, attr))
+				return YNL_PARSE_CB_ERROR;
+		} else if (type == ETHTOOL_A_RSS_CONTEXT) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->context = (__u32)ynl_attr_get_u32(attr);
+		} else if (type == ETHTOOL_A_RSS_HFUNC) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->hfunc = (__u32)ynl_attr_get_u32(attr);
+		} else if (type == ETHTOOL_A_RSS_INDIR) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			unsigned int len = ynl_attr_data_len(attr);
+			__u8 *data = (__u8*)ynl_attr_data(attr);
+			dst->indir.assign(data, data + len);
+		} else if (type == ETHTOOL_A_RSS_HKEY) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			unsigned int len = ynl_attr_data_len(attr);
+			__u8 *data = (__u8*)ynl_attr_data(attr);
+			dst->hkey.assign(data, data + len);
+		} else if (type == ETHTOOL_A_RSS_INPUT_XFRM) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->input_xfrm = (__u32)ynl_attr_get_u32(attr);
+		}
+	}
+
+	return YNL_PARSE_CB_OK;
+}
+
+std::unique_ptr<ethtool_rss_create_act_rsp>
+ethtool_rss_create_act(ynl_cpp::ynl_socket&  ys,
+		       ethtool_rss_create_act_req& req)
+{
+	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
+	std::unique_ptr<ethtool_rss_create_act_rsp> rsp;
+	struct nlmsghdr *nlh;
+	int err;
+
+	nlh = ynl_gemsg_start_req(ys, ((struct ynl_sock*)ys)->family_id, ETHTOOL_MSG_RSS_CREATE_ACT, 1);
+	((struct ynl_sock*)ys)->req_policy = &ethtool_rss_nest;
+	yrs.yarg.rsp_policy = &ethtool_rss_nest;
+
+	if (req.header.has_value())
+		ethtool_header_put(nlh, ETHTOOL_A_RSS_HEADER, req.header.value());
+	if (req.context.has_value())
+		ynl_attr_put_u32(nlh, ETHTOOL_A_RSS_CONTEXT, req.context.value());
+	if (req.hfunc.has_value())
+		ynl_attr_put_u32(nlh, ETHTOOL_A_RSS_HFUNC, req.hfunc.value());
+	if (req.indir.size() > 0)
+		ynl_attr_put(nlh, ETHTOOL_A_RSS_INDIR, req.indir.data(), req.indir.size());
+	if (req.hkey.size() > 0)
+		ynl_attr_put(nlh, ETHTOOL_A_RSS_HKEY, req.hkey.data(), req.hkey.size());
+	if (req.input_xfrm.has_value())
+		ynl_attr_put_u32(nlh, ETHTOOL_A_RSS_INPUT_XFRM, req.input_xfrm.value());
+
+	rsp.reset(new ethtool_rss_create_act_rsp());
+	yrs.yarg.data = rsp.get();
+	yrs.cb = ethtool_rss_create_act_rsp_parse;
+	yrs.rsp_cmd = 51;
+
+	err = ynl_exec(ys, nlh, &yrs);
+	if (err < 0)
+		return nullptr;
+
+	return rsp;
+}
+
+/* ETHTOOL_MSG_RSS_CREATE_ACT - notify */
+/* ============== ETHTOOL_MSG_RSS_DELETE_ACT ============== */
+/* ETHTOOL_MSG_RSS_DELETE_ACT - do */
+int ethtool_rss_delete_act(ynl_cpp::ynl_socket&  ys,
+			   ethtool_rss_delete_act_req& req)
+{
+	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
+	struct nlmsghdr *nlh;
+	int err;
+
+	nlh = ynl_gemsg_start_req(ys, ((struct ynl_sock*)ys)->family_id, ETHTOOL_MSG_RSS_DELETE_ACT, 1);
+	((struct ynl_sock*)ys)->req_policy = &ethtool_rss_nest;
+
+	if (req.header.has_value())
+		ethtool_header_put(nlh, ETHTOOL_A_RSS_HEADER, req.header.value());
+	if (req.context.has_value())
+		ynl_attr_put_u32(nlh, ETHTOOL_A_RSS_CONTEXT, req.context.value());
+
+	err = ynl_exec(ys, nlh, &yrs);
+	if (err < 0)
+		return -1;
+
+	return 0;
+}
+
 /* ETHTOOL_MSG_CABLE_TEST_NTF - event */
 int ethtool_cable_test_ntf_rsp_parse(const struct nlmsghdr *nlh,
 				     struct ynl_parse_arg *yarg)
@@ -6719,8 +7172,40 @@ int ethtool_pse_ntf_rsp_parse(const struct nlmsghdr *nlh,
 	return YNL_PARSE_CB_OK;
 }
 
-static constexpr std::array<ynl_ntf_info, ETHTOOL_MSG_RSS_NTF + 1> ethtool_ntf_info = []() {
-	std::array<ynl_ntf_info, ETHTOOL_MSG_RSS_NTF + 1> arr{};
+/* ETHTOOL_MSG_RSS_DELETE_NTF - event */
+int ethtool_rss_delete_ntf_rsp_parse(const struct nlmsghdr *nlh,
+				     struct ynl_parse_arg *yarg)
+{
+	ethtool_rss_delete_ntf_rsp *dst;
+	const struct nlattr *attr;
+	struct ynl_parse_arg parg;
+
+	dst = (ethtool_rss_delete_ntf_rsp*)yarg->data;
+	parg.ys = yarg->ys;
+
+	ynl_attr_for_each(attr, nlh, yarg->ys->family->hdr_len) {
+		unsigned int type = ynl_attr_type(attr);
+
+		if (type == ETHTOOL_A_RSS_HEADER) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+
+			parg.rsp_policy = &ethtool_header_nest;
+			parg.data = &dst->header;
+			if (ethtool_header_parse(&parg, attr))
+				return YNL_PARSE_CB_ERROR;
+		} else if (type == ETHTOOL_A_RSS_CONTEXT) {
+			if (ynl_attr_validate(yarg, attr))
+				return YNL_PARSE_CB_ERROR;
+			dst->context = (__u32)ynl_attr_get_u32(attr);
+		}
+	}
+
+	return YNL_PARSE_CB_OK;
+}
+
+static constexpr std::array<ynl_ntf_info, ETHTOOL_MSG_RSS_DELETE_NTF + 1> ethtool_ntf_info = []() {
+	std::array<ynl_ntf_info, ETHTOOL_MSG_RSS_DELETE_NTF + 1> arr{};
 	arr[ETHTOOL_MSG_LINKINFO_NTF].policy		= &ethtool_linkinfo_nest;
 	arr[ETHTOOL_MSG_LINKINFO_NTF].cb		= ethtool_linkinfo_get_rsp_parse;
 	arr[ETHTOOL_MSG_LINKMODES_NTF].policy		= &ethtool_linkmodes_nest;
@@ -6763,6 +7248,10 @@ static constexpr std::array<ynl_ntf_info, ETHTOOL_MSG_RSS_NTF + 1> ethtool_ntf_i
 	arr[ETHTOOL_MSG_PSE_NTF].cb		= ethtool_pse_ntf_rsp_parse;
 	arr[ETHTOOL_MSG_RSS_NTF].policy		= &ethtool_rss_nest;
 	arr[ETHTOOL_MSG_RSS_NTF].cb		= ethtool_rss_get_rsp_parse;
+	arr[ETHTOOL_MSG_RSS_CREATE_NTF].policy		= &ethtool_rss_nest;
+	arr[ETHTOOL_MSG_RSS_CREATE_NTF].cb		= ethtool_rss_create_act_rsp_parse;
+	arr[ETHTOOL_MSG_RSS_DELETE_NTF].policy		= &ethtool_rss_nest;
+	arr[ETHTOOL_MSG_RSS_DELETE_NTF].cb		= ethtool_rss_delete_ntf_rsp_parse;
 	return arr;
 } ();
 
