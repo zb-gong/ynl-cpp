@@ -77,6 +77,8 @@ class Type(SpecAttr):
         self.c_name = c_lower(self.name)
         if self.c_name in _C_KW:
             self.c_name += "_"
+        if self.c_name[0].isdigit():
+            self.c_name = '_' + self.c_name
 
         # Added by resolve():
         self.enum_name = None
@@ -653,14 +655,14 @@ class TypeArrayNest(Type):
             raise Exception(f"Sub-type {self.attr['sub-type']} not supported yet")
 
     def _attr_typol(self):
+        if self.attr["sub-type"] in scalars:
+            return {"type": f"YNL_PT_U{c_upper(self.attr['sub-type'][1:])}"}
         return {"type": "YNL_PT_NEST", "nest": f"&{self.nested_render_name}_nest"}
 
     def _attr_get(self, ri, var):
         local_vars = ["const struct nlattr *attr2;"]
         get_lines = [
             f"attr_{self.c_name} = attr;",
-            "ynl_attr_for_each_nested(attr2, attr)",
-            f"\t{var}->n_{self.c_name}++;",
         ]
         return get_lines, None, local_vars
 
@@ -870,7 +872,7 @@ class AttrSet(SpecAttrSet):
         elif elem["type"] == "nest":
             t = TypeNest(self.family, self, elem, value)
         elif elem["type"] == "indexed-array" and "sub-type" in elem:
-            if elem["sub-type"] == "nest":
+            if elem["sub-type"] in ["nest", "u32"]:
                 t = TypeArrayNest(self.family, self, elem, value)
             else:
                 raise Exception(f'new_attr: unsupported sub-type {elem["sub-type"]}')
@@ -1440,7 +1442,7 @@ class CodeWriter:
         self._ifdef_block = config_option
 
 
-scalars = {"u8", "u16", "u32", "u64", "s32", "s64", "uint", "sint"}
+scalars = {"u8", "u16", "u32", "u64", "s8", "s16", "s32", "s64", "uint", "sint"}
 
 direction_to_suffix = {"reply": "_rsp", "request": "_req", "": ""}
 
@@ -1701,6 +1703,9 @@ def _multi_parse(ri, struct, init_lines, local_vars):
             if aspec["sub-type"] == "nest":
                 local_vars.append(f"const struct nlattr *attr_{aspec.c_name};")
                 array_nests.add(arg)
+            elif aspec["sub-type"] in scalars:
+                local_vars.append(f"const struct nlattr *attr_{aspec.c_name};")
+                array_nests.add(arg)
             else:
                 raise Exception(f'Not supported sub-type {aspec["sub-type"]}')
         if "multi-attr" in aspec:
@@ -1758,13 +1763,19 @@ def _multi_parse(ri, struct, init_lines, local_vars):
         ri.cw.p(f"dst->{aspec.c_name}.resize(n_{aspec.c_name});")
         # ri.cw.p(f"dst->n_{aspec.c_name} = n_{aspec.c_name};")
         ri.cw.p("i = 0;")
-        ri.cw.p(f"parg.rsp_policy = &{aspec.nested_render_name}_nest;")
+        if "nested-attributes" in aspec:
+            ri.cw.p(f"parg.rsp_policy = &{aspec.nested_render_name}_nest;")
         ri.cw.block_start(line=f"ynl_attr_for_each_nested(attr, attr_{aspec.c_name})")
-        ri.cw.p(f"parg.data = &dst->{aspec.c_name}[i];")
-        ri.cw.p(
-            f"if ({aspec.nested_render_name}_parse(&parg, attr, ynl_attr_type(attr)))"
-        )
-        ri.cw.p("return YNL_PARSE_CB_ERROR;")
+        if "nested-attributes" in aspec:
+            ri.cw.p(f"parg.data = &dst->{aspec.c_name}[i];")
+            ri.cw.p(
+                f"if ({aspec.nested_render_name}_parse(&parg, attr, ynl_attr_type(attr)))"
+            )
+            ri.cw.p("return YNL_PARSE_CB_ERROR;")
+        elif aspec.sub_type in scalars:
+            ri.cw.p(f"dst->{aspec.c_name}[i] = ynl_attr_get_{aspec.sub_type}(attr);")
+        else:
+            raise Exception(f"Nest parsing type not supported in {aspec['name']}")
         ri.cw.p("i++;")
         ri.cw.block_end()
         ri.cw.block_end()
