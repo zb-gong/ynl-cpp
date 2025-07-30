@@ -19,6 +19,7 @@ from lib import (
     SpecOperation,
 )
 
+
 def c_upper(name):
     return name.upper().replace("-", "_")
 
@@ -172,7 +173,7 @@ class Type(SpecAttr):
         cw.p(f'arr[{self.enum_name}].name = "{self.name}";')
 
         for key, val in self._attr_typol().items():
-            cw.p(f'arr[{self.enum_name}].{key} = {val};')
+            cw.p(f"arr[{self.enum_name}].{key} = {val};")
 
     def _attr_put_line(self, ri, var, line):
         if self.presence_type() == "flag":
@@ -549,7 +550,7 @@ class TypeNest(Type):
         return self.nested_struct_type
 
     def _attr_typol(self):
-        return {"type": "YNL_PT_NEST", "nest": f"&{self.nested_render_name}_nest" }
+        return {"type": "YNL_PT_NEST", "nest": f"&{self.nested_render_name}_nest"}
 
     def _attr_policy(self, policy):
         return "NLA_POLICY_NESTED(" + self.nested_render_name + "_nl_policy)"
@@ -571,7 +572,7 @@ class TypeNest(Type):
         ]
         init_lines = [
             f"parg.rsp_policy = &{self.nested_render_name}_nest;",
-            f"parg.data = &{var}->{self.c_name};",
+            f"parg.data = &{var}->{self.c_name}.emplace();",
         ]
         return get_lines, init_lines, None
 
@@ -681,7 +682,7 @@ class TypeNestTypeValue(Type):
         local_vars = []
         init_lines = [
             f"parg.rsp_policy = &{self.nested_render_name}_nest;",
-            f"parg.data = &{var}->{self.c_name};",
+            f"parg.data = &{var}->{self.c_name}.emplace();",
         ]
         if "type-value" in self.attr:
             tv_names = [c_lower(x) for x in self.attr["type-value"]]
