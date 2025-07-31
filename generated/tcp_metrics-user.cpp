@@ -178,7 +178,7 @@ int tcp_metrics_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &tcp_metrics_metrics_nest;
-			parg.data = &dst->vals;
+			parg.data = &dst->vals.emplace();
 			if (tcp_metrics_metrics_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == TCP_METRICS_ATTR_FOPEN_MSS) {

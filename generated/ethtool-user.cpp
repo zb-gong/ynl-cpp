@@ -7,13 +7,8 @@
 
 #include <array>
 
+#include <linux/ethtool.h>
 #include <linux/ethtool_netlink_generated.h>
-#include <linux/ethtool.h>
-#include <linux/ethtool.h>
-#include <linux/ethtool.h>
-#include <linux/ethtool.h>
-#include <linux/ethtool.h>
-#include <linux/ethtool.h>
 
 #include <linux/genetlink.h>
 
@@ -2433,7 +2428,7 @@ int ethtool_cable_nest_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_cable_result_nest;
-			parg.data = &dst->result;
+			parg.data = &dst->result.emplace();
 			if (ethtool_cable_result_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_CABLE_NEST_FAULT_LENGTH) {
@@ -2441,7 +2436,7 @@ int ethtool_cable_nest_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_cable_fault_length_nest;
-			parg.data = &dst->fault_length;
+			parg.data = &dst->fault_length.emplace();
 			if (ethtool_cable_fault_length_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -2479,7 +2474,7 @@ int ethtool_stats_grp_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_stats_grp_hist_nest;
-			parg.data = &dst->hist_rx;
+			parg.data = &dst->hist_rx.emplace();
 			if (ethtool_stats_grp_hist_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_STATS_GRP_HIST_TX) {
@@ -2487,7 +2482,7 @@ int ethtool_stats_grp_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_stats_grp_hist_nest;
-			parg.data = &dst->hist_tx;
+			parg.data = &dst->hist_tx.emplace();
 			if (ethtool_stats_grp_hist_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_STATS_GRP_HIST_BKT_LOW) {
@@ -2657,7 +2652,7 @@ int ethtool_bitset_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_bits_nest;
-			parg.data = &dst->bits;
+			parg.data = &dst->bits.emplace();
 			if (ethtool_bitset_bits_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_BITSET_VALUE) {
@@ -2768,7 +2763,7 @@ int ethtool_tunnel_udp_table_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->types;
+			parg.data = &dst->types.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TUNNEL_UDP_TABLE_ENTRY) {
@@ -2862,7 +2857,7 @@ int ethtool_tunnel_udp_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_tunnel_udp_table_nest;
-			parg.data = &dst->table;
+			parg.data = &dst->table.emplace();
 			if (ethtool_tunnel_udp_table_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -2891,7 +2886,7 @@ int ethtool_strset_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_STRSET_STRINGSETS) {
@@ -2899,7 +2894,7 @@ int ethtool_strset_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_stringsets_nest;
-			parg.data = &dst->stringsets;
+			parg.data = &dst->stringsets.emplace();
 			if (ethtool_stringsets_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -2993,7 +2988,7 @@ int ethtool_linkinfo_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_LINKINFO_PORT) {
@@ -3132,7 +3127,7 @@ int ethtool_linkmodes_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_LINKMODES_AUTONEG) {
@@ -3144,7 +3139,7 @@ int ethtool_linkmodes_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->ours;
+			parg.data = &dst->ours.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_LINKMODES_PEER) {
@@ -3152,7 +3147,7 @@ int ethtool_linkmodes_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->peer;
+			parg.data = &dst->peer.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_LINKMODES_SPEED) {
@@ -3303,7 +3298,7 @@ int ethtool_linkstate_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_LINKSTATE_LINK) {
@@ -3413,7 +3408,7 @@ int ethtool_debug_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_DEBUG_MSGMASK) {
@@ -3421,7 +3416,7 @@ int ethtool_debug_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->msgmask;
+			parg.data = &dst->msgmask.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -3531,7 +3526,7 @@ int ethtool_wol_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_WOL_MODES) {
@@ -3539,7 +3534,7 @@ int ethtool_wol_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->modes;
+			parg.data = &dst->modes.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_WOL_SOPASS) {
@@ -3656,7 +3651,7 @@ int ethtool_features_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_FEATURES_HW) {
@@ -3664,7 +3659,7 @@ int ethtool_features_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->hw;
+			parg.data = &dst->hw.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_FEATURES_WANTED) {
@@ -3672,7 +3667,7 @@ int ethtool_features_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->wanted;
+			parg.data = &dst->wanted.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_FEATURES_ACTIVE) {
@@ -3680,7 +3675,7 @@ int ethtool_features_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->active;
+			parg.data = &dst->active.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_FEATURES_NOCHANGE) {
@@ -3688,7 +3683,7 @@ int ethtool_features_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->nochange;
+			parg.data = &dst->nochange.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -3775,7 +3770,7 @@ int ethtool_features_set_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_FEATURES_HW) {
@@ -3783,7 +3778,7 @@ int ethtool_features_set_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->hw;
+			parg.data = &dst->hw.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_FEATURES_WANTED) {
@@ -3791,7 +3786,7 @@ int ethtool_features_set_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->wanted;
+			parg.data = &dst->wanted.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_FEATURES_ACTIVE) {
@@ -3799,7 +3794,7 @@ int ethtool_features_set_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->active;
+			parg.data = &dst->active.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_FEATURES_NOCHANGE) {
@@ -3807,7 +3802,7 @@ int ethtool_features_set_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->nochange;
+			parg.data = &dst->nochange.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -3871,7 +3866,7 @@ int ethtool_privflags_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_PRIVFLAGS_FLAGS) {
@@ -3879,7 +3874,7 @@ int ethtool_privflags_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->flags;
+			parg.data = &dst->flags.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -3990,7 +3985,7 @@ int ethtool_rings_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_RINGS_RX_MAX) {
@@ -4200,7 +4195,7 @@ int ethtool_channels_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_CHANNELS_RX_MAX) {
@@ -4357,7 +4352,7 @@ int ethtool_coalesce_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_COALESCE_RX_USECS) {
@@ -4473,7 +4468,7 @@ int ethtool_coalesce_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_profile_nest;
-			parg.data = &dst->rx_profile;
+			parg.data = &dst->rx_profile.emplace();
 			if (ethtool_profile_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_COALESCE_TX_PROFILE) {
@@ -4481,7 +4476,7 @@ int ethtool_coalesce_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_profile_nest;
-			parg.data = &dst->tx_profile;
+			parg.data = &dst->tx_profile.emplace();
 			if (ethtool_profile_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -4648,7 +4643,7 @@ int ethtool_pause_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_PAUSE_AUTONEG) {
@@ -4668,7 +4663,7 @@ int ethtool_pause_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_pause_stat_nest;
-			parg.data = &dst->stats;
+			parg.data = &dst->stats.emplace();
 			if (ethtool_pause_stat_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_PAUSE_STATS_SRC) {
@@ -4790,7 +4785,7 @@ int ethtool_eee_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_EEE_MODES_OURS) {
@@ -4798,7 +4793,7 @@ int ethtool_eee_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->modes_ours;
+			parg.data = &dst->modes_ours.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_EEE_MODES_PEER) {
@@ -4806,7 +4801,7 @@ int ethtool_eee_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->modes_peer;
+			parg.data = &dst->modes_peer.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_EEE_ACTIVE) {
@@ -4941,7 +4936,7 @@ int ethtool_tsinfo_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSINFO_TIMESTAMPING) {
@@ -4949,7 +4944,7 @@ int ethtool_tsinfo_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->timestamping;
+			parg.data = &dst->timestamping.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSINFO_TX_TYPES) {
@@ -4957,7 +4952,7 @@ int ethtool_tsinfo_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->tx_types;
+			parg.data = &dst->tx_types.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSINFO_RX_FILTERS) {
@@ -4965,7 +4960,7 @@ int ethtool_tsinfo_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->rx_filters;
+			parg.data = &dst->rx_filters.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSINFO_PHC_INDEX) {
@@ -4977,7 +4972,7 @@ int ethtool_tsinfo_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_ts_stat_nest;
-			parg.data = &dst->stats;
+			parg.data = &dst->stats.emplace();
 			if (ethtool_ts_stat_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER) {
@@ -4985,7 +4980,7 @@ int ethtool_tsinfo_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_ts_hwtstamp_provider_nest;
-			parg.data = &dst->hwtstamp_provider;
+			parg.data = &dst->hwtstamp_provider.emplace();
 			if (ethtool_ts_hwtstamp_provider_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSINFO_HWTSTAMP_SOURCE) {
@@ -5127,7 +5122,7 @@ int ethtool_tunnel_info_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TUNNEL_INFO_UDP_PORTS) {
@@ -5135,7 +5130,7 @@ int ethtool_tunnel_info_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_tunnel_udp_nest;
-			parg.data = &dst->udp_ports;
+			parg.data = &dst->udp_ports.emplace();
 			if (ethtool_tunnel_udp_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -5222,7 +5217,7 @@ int ethtool_fec_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_FEC_MODES) {
@@ -5230,7 +5225,7 @@ int ethtool_fec_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->modes;
+			parg.data = &dst->modes.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_FEC_AUTO) {
@@ -5246,7 +5241,7 @@ int ethtool_fec_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_fec_stat_nest;
-			parg.data = &dst->stats;
+			parg.data = &dst->stats.emplace();
 			if (ethtool_fec_stat_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -5361,7 +5356,7 @@ int ethtool_module_eeprom_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_MODULE_EEPROM_DATA) {
@@ -5474,7 +5469,7 @@ int ethtool_stats_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_STATS_GROUPS) {
@@ -5482,7 +5477,7 @@ int ethtool_stats_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->groups;
+			parg.data = &dst->groups.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_STATS_GRP) {
@@ -5490,7 +5485,7 @@ int ethtool_stats_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_stats_grp_nest;
-			parg.data = &dst->grp;
+			parg.data = &dst->grp.emplace();
 			if (ethtool_stats_grp_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_STATS_SRC) {
@@ -5584,7 +5579,7 @@ int ethtool_phc_vclocks_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_PHC_VCLOCKS_NUM) {
@@ -5675,7 +5670,7 @@ int ethtool_module_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_MODULE_POWER_MODE_POLICY) {
@@ -5800,7 +5795,7 @@ int ethtool_pse_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_PODL_PSE_ADMIN_STATE) {
@@ -5986,7 +5981,7 @@ int ethtool_rss_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_RSS_CONTEXT) {
@@ -6018,7 +6013,7 @@ int ethtool_rss_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_flow_nest;
-			parg.data = &dst->flow_hash;
+			parg.data = &dst->flow_hash.emplace();
 			if (ethtool_flow_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -6108,7 +6103,7 @@ int ethtool_plca_get_cfg_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_PLCA_VERSION) {
@@ -6265,7 +6260,7 @@ int ethtool_plca_get_status_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_PLCA_VERSION) {
@@ -6384,7 +6379,7 @@ int ethtool_mm_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_MM_PMAC_ENABLED) {
@@ -6424,7 +6419,7 @@ int ethtool_mm_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_mm_stat_nest;
-			parg.data = &dst->stats;
+			parg.data = &dst->stats.emplace();
 			if (ethtool_mm_stat_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -6567,7 +6562,7 @@ int ethtool_phy_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_PHY_INDEX) {
@@ -6681,7 +6676,7 @@ int ethtool_tsconfig_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSCONFIG_HWTSTAMP_PROVIDER) {
@@ -6689,7 +6684,7 @@ int ethtool_tsconfig_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_ts_hwtstamp_provider_nest;
-			parg.data = &dst->hwtstamp_provider;
+			parg.data = &dst->hwtstamp_provider.emplace();
 			if (ethtool_ts_hwtstamp_provider_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSCONFIG_TX_TYPES) {
@@ -6697,7 +6692,7 @@ int ethtool_tsconfig_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->tx_types;
+			parg.data = &dst->tx_types.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSCONFIG_RX_FILTERS) {
@@ -6705,7 +6700,7 @@ int ethtool_tsconfig_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->rx_filters;
+			parg.data = &dst->rx_filters.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSCONFIG_HWTSTAMP_FLAGS) {
@@ -6713,7 +6708,7 @@ int ethtool_tsconfig_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->hwtstamp_flags;
+			parg.data = &dst->hwtstamp_flags.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -6799,7 +6794,7 @@ int ethtool_tsconfig_set_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSCONFIG_HWTSTAMP_PROVIDER) {
@@ -6807,7 +6802,7 @@ int ethtool_tsconfig_set_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_ts_hwtstamp_provider_nest;
-			parg.data = &dst->hwtstamp_provider;
+			parg.data = &dst->hwtstamp_provider.emplace();
 			if (ethtool_ts_hwtstamp_provider_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSCONFIG_TX_TYPES) {
@@ -6815,7 +6810,7 @@ int ethtool_tsconfig_set_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->tx_types;
+			parg.data = &dst->tx_types.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSCONFIG_RX_FILTERS) {
@@ -6823,7 +6818,7 @@ int ethtool_tsconfig_set_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->rx_filters;
+			parg.data = &dst->rx_filters.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_TSCONFIG_HWTSTAMP_FLAGS) {
@@ -6831,7 +6826,7 @@ int ethtool_tsconfig_set_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_bitset_nest;
-			parg.data = &dst->hwtstamp_flags;
+			parg.data = &dst->hwtstamp_flags.emplace();
 			if (ethtool_bitset_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -6928,7 +6923,7 @@ int ethtool_rss_create_act_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_RSS_CONTEXT) {
@@ -7043,7 +7038,7 @@ int ethtool_cable_test_ntf_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_CABLE_TEST_NTF_STATUS) {
@@ -7075,7 +7070,7 @@ int ethtool_cable_test_tdr_ntf_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_CABLE_TEST_TDR_NTF_STATUS) {
@@ -7087,7 +7082,7 @@ int ethtool_cable_test_tdr_ntf_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_cable_nest_nest;
-			parg.data = &dst->nest;
+			parg.data = &dst->nest.emplace();
 			if (ethtool_cable_nest_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -7115,7 +7110,7 @@ int ethtool_module_fw_flash_ntf_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_MODULE_FW_FLASH_STATUS) {
@@ -7159,7 +7154,7 @@ int ethtool_pse_ntf_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_PSE_NTF_EVENTS) {
@@ -7191,7 +7186,7 @@ int ethtool_rss_delete_ntf_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ethtool_header_nest;
-			parg.data = &dst->header;
+			parg.data = &dst->header.emplace();
 			if (ethtool_header_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == ETHTOOL_A_RSS_CONTEXT) {

@@ -1645,7 +1645,11 @@ int nl80211_iface_limit_attributes_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_supported_iftypes_nest;
+<<<<<<< HEAD
 			parg.data = &dst->types;
+=======
+			parg.data = &dst->types.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_supported_iftypes_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -1844,7 +1848,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->unspecified;
+=======
+			parg.data = &dst->unspecified.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_ADHOC) {
@@ -1852,7 +1860,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->adhoc;
+=======
+			parg.data = &dst->adhoc.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_STATION) {
@@ -1860,7 +1872,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->station;
+=======
+			parg.data = &dst->station.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_AP) {
@@ -1868,7 +1884,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->ap;
+=======
+			parg.data = &dst->ap.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_AP_VLAN) {
@@ -1876,7 +1896,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->ap_vlan;
+=======
+			parg.data = &dst->ap_vlan.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_WDS) {
@@ -1884,7 +1908,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->wds;
+=======
+			parg.data = &dst->wds.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_MONITOR) {
@@ -1892,7 +1920,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->monitor;
+=======
+			parg.data = &dst->monitor.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_MESH_POINT) {
@@ -1900,7 +1932,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->mesh_point;
+=======
+			parg.data = &dst->mesh_point.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_P2P_CLIENT) {
@@ -1908,7 +1944,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->p2p_client;
+=======
+			parg.data = &dst->p2p_client.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_P2P_GO) {
@@ -1916,7 +1956,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->p2p_go;
+=======
+			parg.data = &dst->p2p_go.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_P2P_DEVICE) {
@@ -1924,7 +1968,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->p2p_device;
+=======
+			parg.data = &dst->p2p_device.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_OCB) {
@@ -1932,7 +1980,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->ocb;
+=======
+			parg.data = &dst->ocb.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_IFTYPE_NAN) {
@@ -1940,7 +1992,11 @@ int nl80211_iftype_attrs_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_frame_type_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->nan;
+=======
+			parg.data = &dst->nan.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_frame_type_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -2418,7 +2474,11 @@ int nl80211_wiphy_bands_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_band_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->_2ghz;
+=======
+			parg.data = &dst->_2ghz.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_band_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_BAND_5GHZ) {
@@ -2426,7 +2486,11 @@ int nl80211_wiphy_bands_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_band_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->_5ghz;
+=======
+			parg.data = &dst->_5ghz.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_band_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_BAND_60GHZ) {
@@ -2434,7 +2498,11 @@ int nl80211_wiphy_bands_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_band_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->_60ghz;
+=======
+			parg.data = &dst->_60ghz.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_band_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_BAND_6GHZ) {
@@ -2442,7 +2510,11 @@ int nl80211_wiphy_bands_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_band_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->_6ghz;
+=======
+			parg.data = &dst->_6ghz.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_band_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_BAND_S1GHZ) {
@@ -2450,7 +2522,11 @@ int nl80211_wiphy_bands_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_band_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->s1ghz;
+=======
+			parg.data = &dst->s1ghz.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_band_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_BAND_LC) {
@@ -2458,7 +2534,11 @@ int nl80211_wiphy_bands_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_band_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->lc;
+=======
+			parg.data = &dst->lc.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_band_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -2605,7 +2685,11 @@ int nl80211_get_wiphy_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_iftype_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->rx_frame_types;
+=======
+			parg.data = &dst->rx_frame_types.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_iftype_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_SAR_SPEC) {
@@ -2613,7 +2697,11 @@ int nl80211_get_wiphy_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_sar_attributes_nest;
+<<<<<<< HEAD
 			parg.data = &dst->sar_spec;
+=======
+			parg.data = &dst->sar_spec.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_sar_attributes_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_SCHED_SCAN_MAX_REQS) {
@@ -2625,7 +2713,11 @@ int nl80211_get_wiphy_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_supported_iftypes_nest;
+<<<<<<< HEAD
 			parg.data = &dst->software_iftypes;
+=======
+			parg.data = &dst->software_iftypes.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_supported_iftypes_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_SUPPORT_AP_UAPSD) {
@@ -2640,7 +2732,11 @@ int nl80211_get_wiphy_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_supported_iftypes_nest;
+<<<<<<< HEAD
 			parg.data = &dst->supported_iftypes;
+=======
+			parg.data = &dst->supported_iftypes.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_supported_iftypes_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_TDLS_EXTERNAL_SETUP) {
@@ -2654,7 +2750,11 @@ int nl80211_get_wiphy_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_iftype_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->tx_frame_types;
+=======
+			parg.data = &dst->tx_frame_types.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_iftype_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_TXQ_LIMIT) {
@@ -2674,7 +2774,11 @@ int nl80211_get_wiphy_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_txq_stats_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->txq_stats;
+=======
+			parg.data = &dst->txq_stats.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_txq_stats_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_VHT_CAPABILITY_MASK) {
@@ -2708,7 +2812,11 @@ int nl80211_get_wiphy_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_wiphy_bands_nest;
+<<<<<<< HEAD
 			parg.data = &dst->wiphy_bands;
+=======
+			parg.data = &dst->wiphy_bands.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_wiphy_bands_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_WIPHY_COVERAGE_CLASS) {
@@ -2740,7 +2848,11 @@ int nl80211_get_wiphy_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_wowlan_triggers_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->wowlan_triggers_supported;
+=======
+			parg.data = &dst->wowlan_triggers_supported.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_wowlan_triggers_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -2937,7 +3049,11 @@ int nl80211_get_wiphy_rsp_dump_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_iftype_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->rx_frame_types;
+=======
+			parg.data = &dst->rx_frame_types.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_iftype_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_SAR_SPEC) {
@@ -2945,7 +3061,11 @@ int nl80211_get_wiphy_rsp_dump_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_sar_attributes_nest;
+<<<<<<< HEAD
 			parg.data = &dst->sar_spec;
+=======
+			parg.data = &dst->sar_spec.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_sar_attributes_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_SCHED_SCAN_MAX_REQS) {
@@ -2957,7 +3077,11 @@ int nl80211_get_wiphy_rsp_dump_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_supported_iftypes_nest;
+<<<<<<< HEAD
 			parg.data = &dst->software_iftypes;
+=======
+			parg.data = &dst->software_iftypes.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_supported_iftypes_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_SUPPORT_AP_UAPSD) {
@@ -2972,7 +3096,11 @@ int nl80211_get_wiphy_rsp_dump_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_supported_iftypes_nest;
+<<<<<<< HEAD
 			parg.data = &dst->supported_iftypes;
+=======
+			parg.data = &dst->supported_iftypes.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_supported_iftypes_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_TDLS_EXTERNAL_SETUP) {
@@ -2986,7 +3114,11 @@ int nl80211_get_wiphy_rsp_dump_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_iftype_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->tx_frame_types;
+=======
+			parg.data = &dst->tx_frame_types.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_iftype_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_TXQ_LIMIT) {
@@ -3006,7 +3138,11 @@ int nl80211_get_wiphy_rsp_dump_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_txq_stats_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->txq_stats;
+=======
+			parg.data = &dst->txq_stats.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_txq_stats_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_VHT_CAPABILITY_MASK) {
@@ -3040,7 +3176,11 @@ int nl80211_get_wiphy_rsp_dump_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_wiphy_bands_nest;
+<<<<<<< HEAD
 			parg.data = &dst->wiphy_bands;
+=======
+			parg.data = &dst->wiphy_bands.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_wiphy_bands_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_WIPHY_COVERAGE_CLASS) {
@@ -3072,7 +3212,11 @@ int nl80211_get_wiphy_rsp_dump_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_wowlan_triggers_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->wowlan_triggers_supported;
+=======
+			parg.data = &dst->wowlan_triggers_supported.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_wowlan_triggers_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -3186,7 +3330,11 @@ int nl80211_get_interface_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_txq_stats_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->txq_stats;
+=======
+			parg.data = &dst->txq_stats.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_txq_stats_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_4ADDR) {
@@ -3275,7 +3423,11 @@ int nl80211_get_interface_rsp_dump_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &nl80211_txq_stats_attrs_nest;
+<<<<<<< HEAD
 			parg.data = &dst->txq_stats;
+=======
+			parg.data = &dst->txq_stats.emplace();
+>>>>>>> b0a49dc112325c288976400a73ea49070adf3b60
 			if (nl80211_txq_stats_attrs_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NL80211_ATTR_4ADDR) {

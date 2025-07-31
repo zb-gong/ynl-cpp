@@ -19,13 +19,8 @@
 
 #include "ynl.hpp"
 
+#include <linux/ethtool.h>
 #include <linux/ethtool_netlink_generated.h>
-#include <linux/ethtool.h>
-#include <linux/ethtool.h>
-#include <linux/ethtool.h>
-#include <linux/ethtool.h>
-#include <linux/ethtool.h>
-#include <linux/ethtool.h>
 
 namespace ynl_cpp {
 const struct ynl_family& get_ynl_ethtool_family();

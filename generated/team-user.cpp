@@ -265,7 +265,7 @@ int team_item_option_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &team_attr_option_nest;
-			parg.data = &dst->option;
+			parg.data = &dst->option.emplace();
 			if (team_attr_option_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -291,7 +291,7 @@ int team_item_port_parse(struct ynl_parse_arg *yarg,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &team_attr_port_nest;
-			parg.data = &dst->port;
+			parg.data = &dst->port.emplace();
 			if (team_attr_port_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -369,7 +369,7 @@ int team_options_set_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &team_item_option_nest;
-			parg.data = &dst->list_option;
+			parg.data = &dst->list_option.emplace();
 			if (team_item_option_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -431,7 +431,7 @@ int team_options_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &team_item_option_nest;
-			parg.data = &dst->list_option;
+			parg.data = &dst->list_option.emplace();
 			if (team_item_option_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -491,7 +491,7 @@ int team_port_list_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &team_item_port_nest;
-			parg.data = &dst->list_port;
+			parg.data = &dst->list_port.emplace();
 			if (team_item_port_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}

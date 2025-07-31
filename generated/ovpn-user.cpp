@@ -551,7 +551,7 @@ int ovpn_keyconf_parse(struct ynl_parse_arg *yarg, const struct nlattr *nested)
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ovpn_keydir_nest;
-			parg.data = &dst->encrypt_dir;
+			parg.data = &dst->encrypt_dir.emplace();
 			if (ovpn_keydir_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == OVPN_A_KEYCONF_DECRYPT_DIR) {
@@ -559,7 +559,7 @@ int ovpn_keyconf_parse(struct ynl_parse_arg *yarg, const struct nlattr *nested)
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ovpn_keydir_nest;
-			parg.data = &dst->decrypt_dir;
+			parg.data = &dst->decrypt_dir.emplace();
 			if (ovpn_keydir_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -634,7 +634,7 @@ int ovpn_peer_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ovpn_peer_nest;
-			parg.data = &dst->peer;
+			parg.data = &dst->peer.emplace();
 			if (ovpn_peer_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -768,7 +768,7 @@ int ovpn_key_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &ovpn_keyconf_nest;
-			parg.data = &dst->keyconf;
+			parg.data = &dst->keyconf.emplace();
 			if (ovpn_keyconf_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
