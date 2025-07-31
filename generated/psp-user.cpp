@@ -382,7 +382,7 @@ int psp_rx_assoc_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &psp_keys_nest;
-			parg.data = &dst->rx_key;
+			parg.data = &dst->rx_key.emplace();
 			if (psp_keys_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}

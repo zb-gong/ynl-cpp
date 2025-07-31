@@ -259,7 +259,7 @@ int mptcp_pm_get_addr_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &mptcp_pm_address_nest;
-			parg.data = &dst->addr;
+			parg.data = &dst->addr.emplace();
 			if (mptcp_pm_address_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}

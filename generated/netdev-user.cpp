@@ -631,7 +631,7 @@ int netdev_page_pool_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &netdev_io_uring_provider_info_nest;
-			parg.data = &dst->io_uring;
+			parg.data = &dst->io_uring.emplace();
 			if (netdev_io_uring_provider_info_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}
@@ -713,7 +713,7 @@ int netdev_page_pool_stats_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &netdev_page_pool_info_nest;
-			parg.data = &dst->info;
+			parg.data = &dst->info.emplace();
 			if (netdev_page_pool_info_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST) {
@@ -859,7 +859,7 @@ int netdev_queue_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &netdev_io_uring_provider_info_nest;
-			parg.data = &dst->io_uring;
+			parg.data = &dst->io_uring.emplace();
 			if (netdev_io_uring_provider_info_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NETDEV_A_QUEUE_XSK) {
@@ -867,7 +867,7 @@ int netdev_queue_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &netdev_xsk_info_nest;
-			parg.data = &dst->xsk;
+			parg.data = &dst->xsk.emplace();
 			if (netdev_xsk_info_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}

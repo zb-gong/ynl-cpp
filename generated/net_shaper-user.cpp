@@ -236,7 +236,7 @@ int net_shaper_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &net_shaper_handle_nest;
-			parg.data = &dst->parent;
+			parg.data = &dst->parent.emplace();
 			if (net_shaper_handle_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NET_SHAPER_A_HANDLE) {
@@ -244,7 +244,7 @@ int net_shaper_get_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &net_shaper_handle_nest;
-			parg.data = &dst->handle;
+			parg.data = &dst->handle.emplace();
 			if (net_shaper_handle_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		} else if (type == NET_SHAPER_A_METRIC) {
@@ -417,7 +417,7 @@ int net_shaper_group_rsp_parse(const struct nlmsghdr *nlh,
 				return YNL_PARSE_CB_ERROR;
 
 			parg.rsp_policy = &net_shaper_handle_nest;
-			parg.data = &dst->handle;
+			parg.data = &dst->handle.emplace();
 			if (net_shaper_handle_parse(&parg, attr))
 				return YNL_PARSE_CB_ERROR;
 		}

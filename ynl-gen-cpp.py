@@ -2267,11 +2267,11 @@ def main():
         cw.nl()
         cw.p("#include <array>")
     cw.nl()
-    headers = [parsed.uapi_header]
+    headers = {parsed.uapi_header}
     for definition in parsed["definitions"]:
         if "header" in definition:
-            headers.append(definition["header"])
-    for one in headers:
+            headers.add(definition["header"])
+    for one in sorted(headers):
         cw.p(f"#include <{one}>")
     cw.nl()
 
