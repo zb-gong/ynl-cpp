@@ -684,7 +684,7 @@ dpll_device_get_dump(ynl_cpp::ynl_socket& ys)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &dpll_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<dpll_device_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<dpll_device_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = dpll_device_get_rsp_parse;
 	yds.rsp_cmd = DPLL_CMD_DEVICE_GET;
 
@@ -986,7 +986,7 @@ dpll_pin_get_dump(ynl_cpp::ynl_socket& ys, dpll_pin_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &dpll_pin_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<dpll_pin_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<dpll_pin_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = dpll_pin_get_rsp_parse;
 	yds.rsp_cmd = DPLL_CMD_PIN_GET;
 

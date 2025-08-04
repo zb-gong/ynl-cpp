@@ -684,7 +684,7 @@ ovpn_peer_get_dump(ynl_cpp::ynl_socket& ys, ovpn_peer_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ovpn_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ovpn_peer_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ovpn_peer_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ovpn_peer_get_rsp_parse;
 	yds.rsp_cmd = OVPN_CMD_PEER_GET;
 

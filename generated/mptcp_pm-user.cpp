@@ -309,7 +309,7 @@ mptcp_pm_get_addr_dump(ynl_cpp::ynl_socket& ys)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &mptcp_pm_attr_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<mptcp_pm_get_addr_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<mptcp_pm_get_addr_list*>(arg)->objs.emplace_back());};
 	yds.cb = mptcp_pm_get_addr_rsp_parse;
 	yds.rsp_cmd = MPTCP_PM_CMD_GET_ADDR;
 
