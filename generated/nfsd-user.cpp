@@ -344,7 +344,7 @@ nfsd_rpc_status_get_dump(ynl_cpp::ynl_socket& ys)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &nfsd_rpc_status_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<nfsd_rpc_status_get_rsp_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<nfsd_rpc_status_get_rsp_list*>(arg)->objs.emplace_back());};
 	yds.cb = nfsd_rpc_status_get_rsp_dump_parse;
 	yds.rsp_cmd = NFSD_CMD_RPC_STATUS_GET;
 

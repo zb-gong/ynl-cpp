@@ -252,7 +252,7 @@ std::unique_ptr<psp_dev_get_list> psp_dev_get_dump(ynl_cpp::ynl_socket& ys)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &psp_dev_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<psp_dev_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<psp_dev_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = psp_dev_get_rsp_parse;
 	yds.rsp_cmd = PSP_CMD_DEV_GET;
 
@@ -532,7 +532,7 @@ std::unique_ptr<psp_get_stats_list> psp_get_stats_dump(ynl_cpp::ynl_socket& ys)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &psp_stats_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<psp_get_stats_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<psp_get_stats_list*>(arg)->objs.emplace_back());};
 	yds.cb = psp_get_stats_rsp_parse;
 	yds.rsp_cmd = PSP_CMD_GET_STATS;
 

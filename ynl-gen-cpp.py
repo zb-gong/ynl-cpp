@@ -1993,7 +1993,7 @@ def print_dump(ri):
     ri.cw.p(f"yds.yarg.rsp_policy = &{ri.struct['reply'].render_name}_nest;")
     ri.cw.p("yds.yarg.data = ret.get();")
     ri.cw.p(
-        f"yds.alloc_cb = [](void* arg)->void*{{return &(static_cast<{type_name(ri, rdir(direction))}*>(arg)->objs.emplace_back());}};"
+        f"yds.alloc_cb = [](void* arg)->void* {{return &(static_cast<{type_name(ri, rdir(direction))}*>(arg)->objs.emplace_back());}};"
     )
 
     ri.cw.p(f"yds.cb = {op_prefix(ri, 'reply', deref=True)}_parse;")

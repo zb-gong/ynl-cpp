@@ -318,7 +318,7 @@ net_shaper_get_dump(ynl_cpp::ynl_socket& ys, net_shaper_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &net_shaper_net_shaper_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<net_shaper_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<net_shaper_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = net_shaper_get_rsp_parse;
 	yds.rsp_cmd = NET_SHAPER_CMD_GET;
 
@@ -564,7 +564,7 @@ net_shaper_cap_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &net_shaper_caps_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<net_shaper_cap_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<net_shaper_cap_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = net_shaper_cap_get_rsp_parse;
 	yds.rsp_cmd = NET_SHAPER_CMD_CAP_GET;
 

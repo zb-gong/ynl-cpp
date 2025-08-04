@@ -266,7 +266,7 @@ std::unique_ptr<fou_get_list> fou_get_dump(ynl_cpp::ynl_socket& ys)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &fou_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<fou_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<fou_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = fou_get_rsp_parse;
 	yds.rsp_cmd = FOU_CMD_GET;
 

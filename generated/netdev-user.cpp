@@ -569,7 +569,7 @@ netdev_dev_get_dump(ynl_cpp::ynl_socket& ys)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &netdev_dev_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<netdev_dev_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<netdev_dev_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = netdev_dev_get_rsp_parse;
 	yds.rsp_cmd = NETDEV_CMD_DEV_GET;
 
@@ -679,7 +679,7 @@ netdev_page_pool_get_dump(ynl_cpp::ynl_socket& ys)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &netdev_page_pool_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<netdev_page_pool_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<netdev_page_pool_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = netdev_page_pool_get_rsp_parse;
 	yds.rsp_cmd = NETDEV_CMD_PAGE_POOL_GET;
 
@@ -806,7 +806,7 @@ netdev_page_pool_stats_get_dump(ynl_cpp::ynl_socket& ys)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &netdev_page_pool_stats_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<netdev_page_pool_stats_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<netdev_page_pool_stats_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = netdev_page_pool_stats_get_rsp_parse;
 	yds.rsp_cmd = NETDEV_CMD_PAGE_POOL_STATS_GET;
 
@@ -919,7 +919,7 @@ netdev_queue_get_dump(ynl_cpp::ynl_socket& ys, netdev_queue_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &netdev_queue_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<netdev_queue_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<netdev_queue_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = netdev_queue_get_rsp_parse;
 	yds.rsp_cmd = NETDEV_CMD_QUEUE_GET;
 
@@ -1026,7 +1026,7 @@ netdev_napi_get_dump(ynl_cpp::ynl_socket& ys, netdev_napi_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &netdev_napi_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<netdev_napi_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<netdev_napi_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = netdev_napi_get_rsp_parse;
 	yds.rsp_cmd = NETDEV_CMD_NAPI_GET;
 
@@ -1102,7 +1102,7 @@ netdev_qstats_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &netdev_qstats_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<netdev_qstats_get_rsp_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<netdev_qstats_get_rsp_list*>(arg)->objs.emplace_back());};
 	yds.cb = netdev_qstats_get_rsp_dump_parse;
 	yds.rsp_cmd = NETDEV_CMD_QSTATS_GET;
 
