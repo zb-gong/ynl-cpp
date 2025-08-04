@@ -2169,7 +2169,7 @@ def render_user_family(family, cw, prototype):
         for ntf_op_name, ntf_op in family.ntfs.items():
             max_num = ntf_op.enum_name
         cw.block_start(
-            line=f"static constexpr std::array<ynl_ntf_info, {max_num} + 1> {family['name']}_ntf_info = []()"
+            line=f"static constexpr std::array<ynl_ntf_info, {max_num} + 1> {family.c_name}_ntf_info = []()"
         )
         cw.p(f"std::array<ynl_ntf_info, {max_num} + 1> arr{{}};")
         for ntf_op_name, ntf_op in family.ntfs.items():
@@ -2205,8 +2205,8 @@ def render_user_family(family, cw, prototype):
     else:
         cw.p(".hdr_len\t= sizeof(struct genlmsghdr),")
     if family.ntfs:
-        cw.p(f".ntf_info\t= {family['name']}_ntf_info.data(),")
-        cw.p(f".ntf_info_size\t= {family['name']}_ntf_info.size(),")
+        cw.p(f".ntf_info\t= {family.c_name}_ntf_info.data(),")
+        cw.p(f".ntf_info_size\t= {family.c_name}_ntf_info.size(),")
     cw.block_end(line=";")
 
     cw.block_start(f"{proto}")
