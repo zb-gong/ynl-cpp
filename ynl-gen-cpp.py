@@ -84,7 +84,7 @@ class Type(SpecAttr):
                 self.nested_struct_type = self.nested_render_name
 
         self.c_name = c_lower(self.name)
-        if self.c_name in _C_KW:
+        if self.c_name in _C_KW or self.c_name in _CPP_KW:
             self.c_name += "_"
         if self.c_name[0].isdigit():
             self.c_name = "_" + self.c_name
@@ -154,11 +154,10 @@ class Type(SpecAttr):
     def struct_member(self, ri):
         member = self._complex_member_type(ri)
         if member:
-            vec = True if self.is_multi_val() else False
-            if self.is_recursive_for_op(ri):
-                vec = True
-            if vec:
+            if self.is_multi_val():
                 ri.cw.p(f"std::vector<{member}> {self.c_name};")
+            elif self.is_recursive_for_op(ri):
+                ri.cw.p(f"std::unique_ptr<{member}> {self.c_name};")
             else:
                 ri.cw.p(f"std::optional<{member}> {self.c_name};")
 
@@ -190,12 +189,10 @@ class Type(SpecAttr):
             ri.cw.p(f"if ({var}.{self.c_name})")
         elif self.presence_type() == "bit":
             member = self._complex_member_type(ri)
-            vec = True if self.is_multi_val() else False
-            if self.is_recursive_for_op(ri):
-                vec = True
-
-            if vec:
+            if self.is_multi_val():
                 ri.cw.p(f"if ({var}.{self.c_name}.size() > 0)")
+            elif self.is_recursive_for_op(ri):
+                ri.cw.p(f"if ({var}.{self.c_name})")
             else:
                 ri.cw.p(f"if ({var}.{self.c_name}.has_value())")
 
@@ -597,24 +594,31 @@ class TypeNest(Type):
         return "NLA_POLICY_NESTED(" + self.nested_render_name + "_nl_policy)"
 
     def attr_put(self, ri, var):
-        # at = "" if self.is_recursive_for_op(ri) else "&"
-        at = ""
+        val = f"{var}.{self.c_name}"
+        val = "*" + val if self.is_recursive_for_op(ri) else val + ".value()"
         self._attr_put_line(
             ri,
             var,
-            f"{self.nested_render_name}_put(nlh, "
-            + f"{self.enum_name}, {at}{var}.{self.c_name}.value())",
+            f"{self.nested_render_name}_put(nlh, " + f"{self.enum_name}, {val})",
         )
 
     def _attr_get(self, ri, var):
+        pns = self.family.pure_nested_structs[self.nested_attrs]
+        args = ["&parg", "attr"]
+        for sel in pns.external_selectors():
+            args.append(f"{var}->{sel.name}")
         get_lines = [
-            f"if ({self.nested_render_name}_parse(&parg, attr))",
+            f"if ({self.nested_render_name}_parse({', '.join(args)}))",
             "return YNL_PARSE_CB_ERROR;",
         ]
-        init_lines = [
-            f"parg.rsp_policy = &{self.nested_render_name}_nest;",
-            f"parg.data = &{var}->{self.c_name}.emplace();",
-        ]
+        init_lines = [f"parg.rsp_policy = &{self.nested_render_name}_nest;"]
+        if self.is_recursive_for_op(ri):
+            init_lines += [
+                f"{var}->{self.c_name} = std::make_unique<{self._complex_member_type(ri)}>();",
+                f"parg.data = {var}->{self.c_name}.get();",
+            ]
+        else:
+            init_lines.append(f"parg.data = &{var}->{self.c_name}.emplace();")
         return get_lines, init_lines, None
 
 
@@ -912,6 +916,13 @@ class Struct:
             raise Exception("Inheriting different members not supported")
         self.inherited = [c_lower(x) for x in sorted(self._inherited)]
 
+    def external_selectors(self):
+        sels = []
+        for name, attr in self.attr_list:
+            if isinstance(attr, TypeSubMessage) and attr.selector.is_external():
+                sels.append(attr.selector)
+        return sels
+
 
 class EnumEntry(SpecEnumEntry):
     def __init__(self, enum_set, yaml, prev, value_start):
@@ -997,7 +1008,7 @@ class AttrSet(SpecAttrSet):
 
     def resolve(self):
         self.c_name = c_lower(self.name)
-        if self.c_name in _C_KW:
+        if self.c_name in _C_KW or self.c_name in _CPP_KW:
             self.c_name += "_"
         if self.c_name == self.family.c_name:
             self.c_name = ""
@@ -1726,6 +1737,49 @@ _C_KW = {
     "while",
 }
 
+_CPP_KW = {
+    "and",
+    "and_eq",
+    "bitand",
+    "bitor",
+    "class",
+    "compl",
+    "constexpr",
+    "const_cast",
+    "decltype",
+    "delete",
+    "dynamic_cast",
+    "explicit",
+    "false",
+    "friend",
+    "mutable",
+    "namespace",
+    "new",
+    "noexcept",
+    "not",
+    "not_eq",
+    "nullptr",
+    "operator",
+    "or",
+    "or_eq",
+    "private",
+    "protected",
+    "public",
+    "reinterpret_cast",
+    "static_cast",
+    "template",
+    "this",
+    "throw",
+    "true",
+    "try",
+    "typeid",
+    "typename",
+    "using",
+    "virtual",
+    "xor",
+    "xor_eq",
+}
+
 
 def rdir(direction):
     if direction == "reply":
@@ -2165,6 +2219,8 @@ def parse_rsp_submsg(ri, struct):
 
 def parse_rsp_nested_prototype(ri, struct, suffix=";"):
     func_args = ["struct ynl_parse_arg *yarg", "const struct nlattr *nested"]
+    for sel in struct.external_selectors():
+        func_args.append("const std::string& _sel_" + sel.name)
     if struct.submsg:
         func_args.insert(1, "const std::string& sel")
     for arg in struct.inherited:
