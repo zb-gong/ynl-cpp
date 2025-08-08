@@ -522,12 +522,12 @@ struct nlmsghdr* ynl_gemsg_start(
   return nlh;
 }
 
-void ynl_msg_start_req(struct ynl_sock* ys, __u32 id) {
-  ynl_msg_start(ys, id, NLM_F_REQUEST | NLM_F_ACK);
+struct nlmsghdr *ynl_msg_start_req(struct ynl_sock* ys, __u32 id, __u16 flags) {
+  return ynl_msg_start(ys, id, NLM_F_REQUEST | NLM_F_ACK | flags);
 }
 
-void ynl_msg_start_dump(struct ynl_sock* ys, __u32 id) {
-  ynl_msg_start(ys, id, NLM_F_REQUEST | NLM_F_ACK | NLM_F_DUMP);
+struct nlmsghdr *ynl_msg_start_dump(struct ynl_sock* ys, __u32 id) {
+  return ynl_msg_start(ys, id, NLM_F_REQUEST | NLM_F_ACK | NLM_F_DUMP);
 }
 
 struct nlmsghdr*
@@ -732,6 +732,7 @@ struct ynl_sock* ynl_sock_create(
     struct ynl_error* yse) {
   struct sockaddr_nl addr;
   struct ynl_sock* ys;
+  int sock_type;
   socklen_t addrlen;
   int one = 1;
 
@@ -745,7 +746,9 @@ struct ynl_sock* ynl_sock_create(
   ys->rx_buf = &ys->raw_buf[YNL_SOCKET_BUFFER_SIZE];
   ys->ntf_last_next = &ys->ntf_first;
 
-  ys->socket = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+  sock_type = yf->is_classic ? yf->classic_id : NETLINK_GENERIC;
+
+  ys->socket = socket(AF_NETLINK, SOCK_RAW, sock_type);
   if (ys->socket < 0) {
     __perr(yse, "failed to create a netlink socket");
     goto err_free_sock;
@@ -778,7 +781,9 @@ struct ynl_sock* ynl_sock_create(
   ys->portid = addr.nl_pid;
   ys->seq = random();
 
-  if (ynl_sock_read_family(ys, yf->name)) {
+  if (yf->is_classic) {
+		ys->family_id = yf->classic_id;
+	} else if (ynl_sock_read_family(ys, yf->name)) {
     if (yse)
       memcpy(yse, &ys->err, sizeof(*yse));
     goto err_close_sock;
@@ -930,17 +935,21 @@ static int ynl_check_alien(
     struct ynl_sock* ys,
     const struct nlmsghdr* nlh,
     __u32 rsp_cmd) {
-  struct genlmsghdr* gehdr;
+  if (ys->family->is_classic) {
+    if (nlh->nlmsg_type != rsp_cmd)
+      return ynl_ntf_parse(ys, nlh);
+  } else {
+    struct genlmsghdr* gehdr;
 
-  if (ynl_nlmsg_data_len(nlh) < sizeof(*gehdr)) {
-    yerr(ys, YNL_ERROR_INV_RESP, "Kernel responded with truncated message");
-    return -1;
+    if (ynl_nlmsg_data_len(nlh) < sizeof(*gehdr)) {
+      yerr(ys, YNL_ERROR_INV_RESP, "Kernel responded with truncated message");
+      return -1;
+    }
+
+    gehdr = ynl_nlmsg_data(nlh);
+    if (gehdr->cmd != rsp_cmd)
+      return ynl_ntf_parse(ys, nlh);
   }
-
-  gehdr = ynl_nlmsg_data(nlh);
-  if (gehdr->cmd != rsp_cmd)
-    return ynl_ntf_parse(ys, nlh);
-
   return 0;
 }
 

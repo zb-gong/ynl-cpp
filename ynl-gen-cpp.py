@@ -79,7 +79,7 @@ class Type(SpecAttr):
         if self.c_name in _C_KW:
             self.c_name += "_"
         if self.c_name[0].isdigit():
-            self.c_name = '_' + self.c_name
+            self.c_name = "_" + self.c_name
 
         # Added by resolve():
         self.enum_name = None
@@ -286,33 +286,34 @@ class TypeScalar(Type):
         if "byte-order" in attr:
             self.byte_order_comment = f" /* {attr['byte-order']} */"
 
-        if "enum" in self.attr:
-            enum = self.family.consts[self.attr["enum"]]
-            low, high = enum.value_range()
-            if low == None and high == None:
-                self.checks['sparse'] = True
-            else:
-                if "min" not in self.checks:
-                    if low != 0 or self.type[0] == "s":
-                        self.checks["min"] = low
-                if "max" not in self.checks:
-                    self.checks["max"] = high
+        if not family.is_classic():
+            if "enum" in self.attr:
+                enum = self.family.consts[self.attr["enum"]]
+                low, high = enum.value_range()
+                if low == None and high == None:
+                    self.checks["sparse"] = True
+                else:
+                    if "min" not in self.checks:
+                        if low != 0 or self.type[0] == "s":
+                            self.checks["min"] = low
+                    if "max" not in self.checks:
+                        self.checks["max"] = high
 
-        if "min" in self.checks and "max" in self.checks:
-            if self.get_limit("min") > self.get_limit("max"):
+            if "min" in self.checks and "max" in self.checks:
+                if self.get_limit("min") > self.get_limit("max"):
+                    raise Exception(
+                        f'Invalid limit for "{self.name}" min: {self.get_limit("min")} max: {self.get_limit("max")}'
+                    )
+                self.checks["range"] = True
+
+            low = min(self.get_limit("min", 0), self.get_limit("max", 0))
+            high = max(self.get_limit("min", 0), self.get_limit("max", 0))
+            if low < 0 and self.type[0] == "u":
                 raise Exception(
-                    f'Invalid limit for "{self.name}" min: {self.get_limit("min")} max: {self.get_limit("max")}'
+                    f'Invalid limit for "{self.name}" negative limit for unsigned type'
                 )
-            self.checks["range"] = True
-
-        low = min(self.get_limit("min", 0), self.get_limit("max", 0))
-        high = max(self.get_limit("min", 0), self.get_limit("max", 0))
-        if low < 0 and self.type[0] == "u":
-            raise Exception(
-                f'Invalid limit for "{self.name}" negative limit for unsigned type'
-            )
-        if low < -32768 or high > 32767:
-            self.checks["full-range"] = True
+            if low < -32768 or high > 32767:
+                self.checks["full-range"] = True
 
         # Added by resolve():
         self.is_bitfield = None
@@ -989,13 +990,6 @@ class Family(SpecFamily):
     def resolve(self):
         self.resolve_up(super())
 
-        if self.yaml.get("protocol", "genetlink") not in {
-            "genetlink",
-            "genetlink-c",
-            "genetlink-legacy",
-        }:
-            raise Exception("Codegen only supported for genetlink")
-
         self.c_name = c_lower(self.name)
         if "name-prefix" in self.yaml["operations"]:
             self.op_prefix = c_upper(self.yaml["operations"]["name-prefix"])
@@ -1041,6 +1035,9 @@ class Family(SpecFamily):
 
     def new_operation(self, elem, req_value, rsp_value):
         return Operation(self, elem, req_value, rsp_value)
+
+    def is_classic(self):
+        return self.proto == "netlink-raw"
 
     def _mark_notify(self):
         for op in self.msgs.values():
@@ -1233,7 +1230,8 @@ class RenderInfo:
         self.op_mode = op_mode
         self.op = op
 
-        self.fixed_hdr = None
+        self.fixed_hdr = op.fixed_header if op else None
+        self.fixed_hdr_len = "ys->family->hdr_len"
         if op and op.fixed_header:
             self.fixed_hdr = "struct " + c_lower(op.fixed_header)
 
@@ -1275,6 +1273,11 @@ class RenderInfo:
             self.struct["reply"] = Struct(
                 family, self.attr_set, type_list=op["event"]["attributes"]
             )
+
+    def needs_nlflags(self, direction):
+        return (
+            self.op_mode == "do" and direction == "request" and self.family.is_classic()
+        )
 
 
 class CodeWriter:
@@ -1767,7 +1770,12 @@ def _multi_parse(ri, struct, init_lines, local_vars):
         ri.cw.p(f"dst->{arg} = {arg};")
 
     if ri.fixed_hdr:
-        ri.cw.p("hdr = ynl_nlmsg_data_offset(nlh, sizeof(struct genlmsghdr));")
+        if struct.nested:
+            ri.cw.p("hdr = ynl_attr_data(nested);")
+        elif ri.family.is_classic():
+            ri.cw.p("hdr = ynl_nlmsg_data(nlh);")
+        else:
+            ri.cw.p("hdr = ynl_nlmsg_data_offset(nlh, sizeof(struct genlmsghdr));")
         ri.cw.p(f"memcpy(&dst->_hdr, hdr, sizeof({ri.fixed_hdr}));")
     for anest in sorted(all_multi):
         aspec = struct[anest]
@@ -1917,9 +1925,12 @@ def print_req(ri):
     ri.cw.block_start()
     ri.cw.write_func_lvar(local_vars)
 
-    ri.cw.p(
-        f"nlh = ynl_gemsg_start_req(ys, {ri.nl.get_family_id()}, {ri.op.enum_name}, 1);"
-    )
+    if ri.family.is_classic():
+        ri.cw.p(f"nlh = ynl_msg_start_req(ys, {ri.op.enum_name}, req._nlmsg_flags);")
+    else:
+        ri.cw.p(
+            f"nlh = ynl_gemsg_start_req(ys, {ri.nl.get_family_id()}, {ri.op.enum_name}, 1);"
+        )
 
     ri.cw.p(
         f"((struct ynl_sock*)ys)->req_policy = &{ri.struct['request'].render_name}_nest;"
@@ -1929,9 +1940,9 @@ def print_req(ri):
     ri.cw.nl()
 
     if ri.fixed_hdr:
-        ri.cw.p("hdr_len = sizeof(req->_hdr);")
+        ri.cw.p("hdr_len = sizeof(req._hdr);")
         ri.cw.p("hdr = ynl_nlmsg_put_extra_header(nlh, hdr_len);")
-        ri.cw.p("memcpy(hdr, &req->_hdr, hdr_len);")
+        ri.cw.p("memcpy(hdr, &req._hdr, hdr_len);")
         ri.cw.nl()
 
     for _, attr in ri.struct["request"].member_list():
@@ -1991,14 +2002,17 @@ def print_dump(ri):
     else:
         ri.cw.p(f"yds.rsp_cmd = {ri.op.rsp_value};")
     ri.cw.nl()
-    ri.cw.p(
-        f"nlh = ynl_gemsg_start_dump(ys, {ri.nl.get_family_id()}, {ri.op.enum_name}, 1);"
-    )
+    if ri.family.is_classic():
+        ri.cw.p(f"nlh = ynl_msg_start_dump(ys, {ri.op.enum_name});")
+    else:
+        ri.cw.p(
+            f"nlh = ynl_gemsg_start_dump(ys, {ri.nl.get_family_id()}, {ri.op.enum_name}, 1);"
+        )
 
     if ri.fixed_hdr:
-        ri.cw.p("hdr_len = sizeof(req->_hdr);")
+        ri.cw.p("hdr_len = sizeof(req._hdr);")
         ri.cw.p("hdr = ynl_nlmsg_put_extra_header(nlh, hdr_len);")
-        ri.cw.p("memcpy(hdr, &req->_hdr, hdr_len);")
+        ri.cw.p("memcpy(hdr, &req._hdr, hdr_len);")
         ri.cw.nl()
 
     if "request" in ri.op[ri.op_mode]:
@@ -2030,6 +2044,9 @@ def _print_type(ri, direction, struct):
 
     ri.cw.block_start(line=f"struct {ri.family.c_name}{suffix}")
 
+    if ri.needs_nlflags(direction):
+        ri.cw.p("__u16 _nlmsg_flags;")
+        ri.cw.nl()
     if ri.fixed_hdr:
         ri.cw.p(ri.fixed_hdr + " _hdr;")
         ri.cw.nl()
@@ -2065,7 +2082,7 @@ def print_parse_prototype(ri, direction, terminate=True):
 
 
 def print_req_type(ri):
-    if len(ri.struct["request"].attr_list) == 0:
+    if len(ri.struct["request"].attr_list) == 0 and ri.op.fixed_header is None:
         return
     print_type(ri, "request")
 
@@ -2175,7 +2192,13 @@ def render_user_family(family, cw, prototype):
 
     cw.block_start(f"{symbol} = ")
     cw.p(f'.name\t\t= "{family.c_name}",')
-    if family.fixed_header:
+    if family.is_classic():
+        cw.p(f".is_classic\t= true,")
+        cw.p(f'.classic_id\t= {family.get("protonum")},')
+    if family.is_classic():
+        if family.fixed_header:
+            cw.p(f".hdr_len\t= sizeof(struct {c_lower(family.fixed_header)}),")
+    elif family.fixed_header:
         cw.p(
             f".hdr_len\t= sizeof(struct genlmsghdr) + sizeof(struct {c_lower(family.fixed_header)}),"
         )
