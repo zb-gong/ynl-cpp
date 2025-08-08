@@ -228,12 +228,12 @@ netdev_napi_get_dump(ynl_cpp::ynl_socket& ys, netdev_napi_get_req_dump& req);
 
 /* ============== NETDEV_CMD_QSTATS_GET ============== */
 /* NETDEV_CMD_QSTATS_GET - dump */
-struct netdev_qstats_get_req_dump {
+struct netdev_qstats_get_req {
 	std::optional<__u32> ifindex;
 	std::optional<__u64> scope;
 };
 
-struct netdev_qstats_get_rsp_dump {
+struct netdev_qstats_get_rsp {
 	std::optional<__u32> ifindex;
 	std::optional<enum netdev_queue_type> queue_type;
 	std::optional<__u32> queue_id;
@@ -243,13 +243,12 @@ struct netdev_qstats_get_rsp_dump {
 	std::optional<__u64> tx_bytes;
 };
 
-struct netdev_qstats_get_rsp_list {
-	std::list<netdev_qstats_get_rsp_dump> objs;
+struct netdev_qstats_get_list {
+	std::list<netdev_qstats_get_rsp> objs;
 };
 
-std::unique_ptr<netdev_qstats_get_rsp_list>
-netdev_qstats_get_dump(ynl_cpp::ynl_socket& ys,
-		       netdev_qstats_get_req_dump& req);
+std::unique_ptr<netdev_qstats_get_list>
+netdev_qstats_get_dump(ynl_cpp::ynl_socket& ys, netdev_qstats_get_req& req);
 
 /* ============== NETDEV_CMD_BIND_RX ============== */
 /* NETDEV_CMD_BIND_RX - do */

@@ -2947,7 +2947,7 @@ ethtool_strset_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_strset_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_strset_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_strset_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_strset_get_rsp_parse;
 	yds.rsp_cmd = ETHTOOL_MSG_STRSET_GET;
 
@@ -3057,7 +3057,7 @@ ethtool_linkinfo_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_linkinfo_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_linkinfo_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_linkinfo_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_linkinfo_get_rsp_parse;
 	yds.rsp_cmd = ETHTOOL_MSG_LINKINFO_GET;
 
@@ -3220,7 +3220,7 @@ ethtool_linkmodes_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_linkmodes_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_linkmodes_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_linkmodes_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_linkmodes_get_rsp_parse;
 	yds.rsp_cmd = ETHTOOL_MSG_LINKMODES_GET;
 
@@ -3371,7 +3371,7 @@ ethtool_linkstate_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_linkstate_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_linkstate_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_linkstate_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_linkstate_get_rsp_parse;
 	yds.rsp_cmd = ETHTOOL_MSG_LINKSTATE_GET;
 
@@ -3465,7 +3465,7 @@ ethtool_debug_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_debug_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_debug_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_debug_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_debug_get_rsp_parse;
 	yds.rsp_cmd = ETHTOOL_MSG_DEBUG_GET;
 
@@ -3588,7 +3588,7 @@ ethtool_wol_get_dump(ynl_cpp::ynl_socket& ys, ethtool_wol_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_wol_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_wol_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_wol_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_wol_get_rsp_parse;
 	yds.rsp_cmd = ETHTOOL_MSG_WOL_GET;
 
@@ -3732,7 +3732,7 @@ ethtool_features_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_features_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_features_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_features_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_features_get_rsp_parse;
 	yds.rsp_cmd = ETHTOOL_MSG_FEATURES_GET;
 
@@ -3923,7 +3923,7 @@ ethtool_privflags_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_privflags_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_privflags_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_privflags_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_privflags_get_rsp_parse;
 	yds.rsp_cmd = 14;
 
@@ -4102,7 +4102,7 @@ ethtool_rings_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_rings_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_rings_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_rings_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_rings_get_rsp_parse;
 	yds.rsp_cmd = 16;
 
@@ -4276,7 +4276,7 @@ ethtool_channels_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_channels_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_channels_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_channels_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_channels_get_rsp_parse;
 	yds.rsp_cmd = 18;
 
@@ -4525,7 +4525,7 @@ ethtool_coalesce_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_coalesce_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_coalesce_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_coalesce_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_coalesce_get_rsp_parse;
 	yds.rsp_cmd = 20;
 
@@ -4716,7 +4716,7 @@ ethtool_pause_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_pause_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_pause_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_pause_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_pause_get_rsp_parse;
 	yds.rsp_cmd = 22;
 
@@ -4865,7 +4865,7 @@ ethtool_eee_get_dump(ynl_cpp::ynl_socket& ys, ethtool_eee_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_eee_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_eee_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_eee_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_eee_get_rsp_parse;
 	yds.rsp_cmd = 24;
 
@@ -5039,7 +5039,7 @@ ethtool_tsinfo_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_tsinfo_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_tsinfo_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_tsinfo_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_tsinfo_get_rsp_parse;
 	yds.rsp_cmd = 26;
 
@@ -5180,7 +5180,7 @@ ethtool_tunnel_info_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_tunnel_info_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_tunnel_info_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_tunnel_info_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_tunnel_info_get_rsp_parse;
 	yds.rsp_cmd = 29;
 
@@ -5289,7 +5289,7 @@ ethtool_fec_get_dump(ynl_cpp::ynl_socket& ys, ethtool_fec_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_fec_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_fec_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_fec_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_fec_get_rsp_parse;
 	yds.rsp_cmd = 30;
 
@@ -5422,7 +5422,7 @@ ethtool_module_eeprom_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_module_eeprom_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_module_eeprom_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_module_eeprom_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_module_eeprom_get_rsp_parse;
 	yds.rsp_cmd = 32;
 
@@ -5540,7 +5540,7 @@ ethtool_stats_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_stats_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_stats_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_stats_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_stats_get_rsp_parse;
 	yds.rsp_cmd = 33;
 
@@ -5633,7 +5633,7 @@ ethtool_phc_vclocks_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_phc_vclocks_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_phc_vclocks_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_phc_vclocks_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_phc_vclocks_get_rsp_parse;
 	yds.rsp_cmd = 34;
 
@@ -5727,7 +5727,7 @@ ethtool_module_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_module_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_module_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_module_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_module_get_rsp_parse;
 	yds.rsp_cmd = 35;
 
@@ -5915,7 +5915,7 @@ ethtool_pse_get_dump(ynl_cpp::ynl_socket& ys, ethtool_pse_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_pse_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_pse_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_pse_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_pse_get_rsp_parse;
 	yds.rsp_cmd = 37;
 
@@ -6063,7 +6063,7 @@ ethtool_rss_get_dump(ynl_cpp::ynl_socket& ys, ethtool_rss_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_rss_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_rss_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_rss_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_rss_get_rsp_parse;
 	yds.rsp_cmd = ETHTOOL_MSG_RSS_GET;
 
@@ -6184,7 +6184,7 @@ ethtool_plca_get_cfg_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_plca_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_plca_get_cfg_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_plca_get_cfg_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_plca_get_cfg_rsp_parse;
 	yds.rsp_cmd = ETHTOOL_MSG_PLCA_GET_CFG;
 
@@ -6342,7 +6342,7 @@ ethtool_plca_get_status_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_plca_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_plca_get_status_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_plca_get_status_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_plca_get_status_rsp_parse;
 	yds.rsp_cmd = 40;
 
@@ -6467,7 +6467,7 @@ ethtool_mm_get_dump(ynl_cpp::ynl_socket& ys, ethtool_mm_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_mm_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_mm_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_mm_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_mm_get_rsp_parse;
 	yds.rsp_cmd = ETHTOOL_MSG_MM_GET;
 
@@ -6638,7 +6638,7 @@ ethtool_phy_get_dump(ynl_cpp::ynl_socket& ys, ethtool_phy_get_req_dump& req)
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_phy_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_phy_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_phy_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_phy_get_rsp_parse;
 	yds.rsp_cmd = ETHTOOL_MSG_PHY_GET;
 
@@ -6757,7 +6757,7 @@ ethtool_tsconfig_get_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &ethtool_tsconfig_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<ethtool_tsconfig_get_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<ethtool_tsconfig_get_list*>(arg)->objs.emplace_back());};
 	yds.cb = ethtool_tsconfig_get_rsp_parse;
 	yds.rsp_cmd = 47;
 

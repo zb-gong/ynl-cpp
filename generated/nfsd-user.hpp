@@ -41,7 +41,7 @@ struct nfsd_sock {
 
 /* ============== NFSD_CMD_RPC_STATUS_GET ============== */
 /* NFSD_CMD_RPC_STATUS_GET - dump */
-struct nfsd_rpc_status_get_rsp_dump {
+struct nfsd_rpc_status_get_rsp {
 	std::optional<__u32> xid /* big-endian */;
 	std::optional<__u32> flags;
 	std::optional<__u32> prog;
@@ -57,11 +57,11 @@ struct nfsd_rpc_status_get_rsp_dump {
 	std::vector<__u32> compound_ops;
 };
 
-struct nfsd_rpc_status_get_rsp_list {
-	std::list<nfsd_rpc_status_get_rsp_dump> objs;
+struct nfsd_rpc_status_get_list {
+	std::list<nfsd_rpc_status_get_rsp> objs;
 };
 
-std::unique_ptr<nfsd_rpc_status_get_rsp_list>
+std::unique_ptr<nfsd_rpc_status_get_list>
 nfsd_rpc_status_get_dump(ynl_cpp::ynl_socket& ys);
 
 /* ============== NFSD_CMD_THREADS_SET ============== */

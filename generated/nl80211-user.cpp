@@ -3113,7 +3113,7 @@ nl80211_get_wiphy_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &nl80211_nl80211_attrs_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<nl80211_get_wiphy_rsp_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<nl80211_get_wiphy_rsp_list*>(arg)->objs.emplace_back());};
 	yds.cb = nl80211_get_wiphy_rsp_dump_parse;
 	yds.rsp_cmd = 3;
 
@@ -3300,7 +3300,7 @@ nl80211_get_interface_dump(ynl_cpp::ynl_socket& ys,
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &nl80211_nl80211_attrs_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void*{return &(static_cast<nl80211_get_interface_rsp_list*>(arg)->objs.emplace_back());};
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<nl80211_get_interface_rsp_list*>(arg)->objs.emplace_back());};
 	yds.cb = nl80211_get_interface_rsp_dump_parse;
 	yds.rsp_cmd = 7;
 
