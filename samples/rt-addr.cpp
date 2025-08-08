@@ -8,7 +8,7 @@
 #include <ynl.hpp>
 
 std::ostream &operator<<(std::ostream &os,
-                         const ynl_cpp::rt_addr_getaddr_rsp_dump &rsp) {
+                         const ynl_cpp::rt_addr_getaddr_rsp &rsp) {
   char buf[IF_NAMESIZE];
   char addr_str[64];
 
@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  ynl_cpp::rt_addr_getaddr_req_dump req = {};
-  std::unique_ptr<ynl_cpp::rt_addr_getaddr_rsp_list> rsp =
+  ynl_cpp::rt_addr_getaddr_req req = {};
+  std::unique_ptr<ynl_cpp::rt_addr_getaddr_list> rsp =
       ynl_cpp::rt_addr_getaddr_dump(ys, req);
   if (rsp == nullptr) {
     std::cerr << "Error: rt-addr getaddr dump fails" << std::endl;

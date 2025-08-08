@@ -246,15 +246,15 @@ int nfsd_sock_parse(struct ynl_parse_arg *yarg, const struct nlattr *nested)
 
 /* ============== NFSD_CMD_RPC_STATUS_GET ============== */
 /* NFSD_CMD_RPC_STATUS_GET - dump */
-int nfsd_rpc_status_get_rsp_dump_parse(const struct nlmsghdr *nlh,
-				       struct ynl_parse_arg *yarg)
+int nfsd_rpc_status_get_rsp_parse(const struct nlmsghdr *nlh,
+				  struct ynl_parse_arg *yarg)
 {
-	nfsd_rpc_status_get_rsp_dump *dst;
 	unsigned int n_compound_ops = 0;
+	nfsd_rpc_status_get_rsp *dst;
 	const struct nlattr *attr;
 	int i;
 
-	dst = (nfsd_rpc_status_get_rsp_dump*)yarg->data;
+	dst = (nfsd_rpc_status_get_rsp*)yarg->data;
 
 	if (dst->compound_ops.size() > 0)
 		return ynl_error_parse(yarg, "attribute already present (rpc-status.compound-ops)");
@@ -333,19 +333,19 @@ int nfsd_rpc_status_get_rsp_dump_parse(const struct nlmsghdr *nlh,
 	return YNL_PARSE_CB_OK;
 }
 
-std::unique_ptr<nfsd_rpc_status_get_rsp_list>
+std::unique_ptr<nfsd_rpc_status_get_list>
 nfsd_rpc_status_get_dump(ynl_cpp::ynl_socket& ys)
 {
 	struct ynl_dump_no_alloc_state yds = {};
 	struct nlmsghdr *nlh;
 	int err;
 
-	auto ret = std::make_unique<nfsd_rpc_status_get_rsp_list>();
+	auto ret = std::make_unique<nfsd_rpc_status_get_list>();
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &nfsd_rpc_status_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<nfsd_rpc_status_get_rsp_list*>(arg)->objs.emplace_back());};
-	yds.cb = nfsd_rpc_status_get_rsp_dump_parse;
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<nfsd_rpc_status_get_list*>(arg)->objs.emplace_back());};
+	yds.cb = nfsd_rpc_status_get_rsp_parse;
 	yds.rsp_cmd = NFSD_CMD_RPC_STATUS_GET;
 
 	nlh = ynl_gemsg_start_dump(ys, ((struct ynl_sock*)ys)->family_id, NFSD_CMD_RPC_STATUS_GET, 1);
