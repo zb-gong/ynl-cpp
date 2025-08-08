@@ -513,6 +513,36 @@ class TypeBinary(Type):
         ]
 
 
+class TypeBinaryStruct(TypeBinary):
+    def struct_member(self, ri):
+        ri.cw.p(f'std::optional<struct {c_lower(self.get("struct"))}> {self.c_name};')
+
+    def presence_type(self):
+        return "flag"
+
+    def attr_put(self, ri, var):
+        struct_sz = "sizeof(struct " + c_lower(self.get("struct")) + ")"
+        self._attr_put_line(
+            ri,
+            var,
+            f"ynl_attr_put(nlh, {self.enum_name}, "
+            + f"&*{var}.{self.c_name}, {struct_sz})",
+        )
+
+    def _attr_get(self, ri, var):
+        struct_sz = "sizeof(struct " + c_lower(self.get("struct")) + ")"
+        return (
+            [
+                "unsigned int len = ynl_attr_data_len(attr);",
+                f"unsigned int struct_sz = {struct_sz};",
+                f"{var}->{self.c_name}.emplace();",
+                f"memcpy(&*{var}->{self.c_name}, ynl_attr_data(attr), std::min(struct_sz, len));",
+            ],
+            None,
+            None,
+        )
+
+
 class TypeBitfield32(Type):
     def _complex_member_type(self, ri):
         return "struct nla_bitfield32"
@@ -867,7 +897,10 @@ class AttrSet(SpecAttrSet):
         elif elem["type"] == "string":
             t = TypeString(self.family, self, elem, value)
         elif elem["type"] == "binary":
-            t = TypeBinary(self.family, self, elem, value)
+            if "struct" in elem:
+                t = TypeBinaryStruct(self.family, self, elem, value)
+            else:
+                t = TypeBinary(self.family, self, elem, value)
         elif elem["type"] == "bitfield32":
             t = TypeBitfield32(self.family, self, elem, value)
         elif elem["type"] == "nest":
