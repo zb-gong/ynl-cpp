@@ -65,11 +65,11 @@ int rt_addr_deladdr(ynl_cpp::ynl_socket& ys, rt_addr_deladdr_req& req);
 
 /* ============== RTM_GETADDR ============== */
 /* RTM_GETADDR - dump */
-struct rt_addr_getaddr_req_dump {
+struct rt_addr_getaddr_req {
 	struct ifaddrmsg _hdr;
 };
 
-struct rt_addr_getaddr_rsp_dump {
+struct rt_addr_getaddr_rsp {
 	struct ifaddrmsg _hdr;
 
 	std::vector<__u8> address;
@@ -78,12 +78,12 @@ struct rt_addr_getaddr_rsp_dump {
 	std::optional<struct ifa_cacheinfo> cacheinfo;
 };
 
-struct rt_addr_getaddr_rsp_list {
-	std::list<rt_addr_getaddr_rsp_dump> objs;
+struct rt_addr_getaddr_list {
+	std::list<rt_addr_getaddr_rsp> objs;
 };
 
-std::unique_ptr<rt_addr_getaddr_rsp_list>
-rt_addr_getaddr_dump(ynl_cpp::ynl_socket& ys, rt_addr_getaddr_req_dump& req);
+std::unique_ptr<rt_addr_getaddr_list>
+rt_addr_getaddr_dump(ynl_cpp::ynl_socket& ys, rt_addr_getaddr_req& req);
 
 /* ============== RTM_GETMULTICAST ============== */
 /* RTM_GETMULTICAST - do */

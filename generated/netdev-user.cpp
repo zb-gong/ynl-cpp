@@ -1045,13 +1045,13 @@ netdev_napi_get_dump(ynl_cpp::ynl_socket& ys, netdev_napi_get_req_dump& req)
 
 /* ============== NETDEV_CMD_QSTATS_GET ============== */
 /* NETDEV_CMD_QSTATS_GET - dump */
-int netdev_qstats_get_rsp_dump_parse(const struct nlmsghdr *nlh,
-				     struct ynl_parse_arg *yarg)
+int netdev_qstats_get_rsp_parse(const struct nlmsghdr *nlh,
+				struct ynl_parse_arg *yarg)
 {
-	netdev_qstats_get_rsp_dump *dst;
+	netdev_qstats_get_rsp *dst;
 	const struct nlattr *attr;
 
-	dst = (netdev_qstats_get_rsp_dump*)yarg->data;
+	dst = (netdev_qstats_get_rsp*)yarg->data;
 
 	ynl_attr_for_each(attr, nlh, yarg->ys->family->hdr_len) {
 		unsigned int type = ynl_attr_type(attr);
@@ -1090,20 +1090,19 @@ int netdev_qstats_get_rsp_dump_parse(const struct nlmsghdr *nlh,
 	return YNL_PARSE_CB_OK;
 }
 
-std::unique_ptr<netdev_qstats_get_rsp_list>
-netdev_qstats_get_dump(ynl_cpp::ynl_socket& ys,
-		       netdev_qstats_get_req_dump& req)
+std::unique_ptr<netdev_qstats_get_list>
+netdev_qstats_get_dump(ynl_cpp::ynl_socket& ys, netdev_qstats_get_req& req)
 {
 	struct ynl_dump_no_alloc_state yds = {};
 	struct nlmsghdr *nlh;
 	int err;
 
-	auto ret = std::make_unique<netdev_qstats_get_rsp_list>();
+	auto ret = std::make_unique<netdev_qstats_get_list>();
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &netdev_qstats_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<netdev_qstats_get_rsp_list*>(arg)->objs.emplace_back());};
-	yds.cb = netdev_qstats_get_rsp_dump_parse;
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<netdev_qstats_get_list*>(arg)->objs.emplace_back());};
+	yds.cb = netdev_qstats_get_rsp_parse;
 	yds.rsp_cmd = NETDEV_CMD_QSTATS_GET;
 
 	nlh = ynl_gemsg_start_dump(ys, ((struct ynl_sock*)ys)->family_id, NETDEV_CMD_QSTATS_GET, 1);

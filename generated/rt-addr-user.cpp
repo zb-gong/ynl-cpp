@@ -151,14 +151,14 @@ int rt_addr_deladdr(ynl_cpp::ynl_socket& ys, rt_addr_deladdr_req& req)
 
 /* ============== RTM_GETADDR ============== */
 /* RTM_GETADDR - dump */
-int rt_addr_getaddr_rsp_dump_parse(const struct nlmsghdr *nlh,
-				   struct ynl_parse_arg *yarg)
+int rt_addr_getaddr_rsp_parse(const struct nlmsghdr *nlh,
+			      struct ynl_parse_arg *yarg)
 {
-	rt_addr_getaddr_rsp_dump *dst;
 	const struct nlattr *attr;
+	rt_addr_getaddr_rsp *dst;
 	void *hdr;
 
-	dst = (rt_addr_getaddr_rsp_dump*)yarg->data;
+	dst = (rt_addr_getaddr_rsp*)yarg->data;
 
 	hdr = ynl_nlmsg_data(nlh);
 	memcpy(&dst->_hdr, hdr, sizeof(struct ifaddrmsg));
@@ -195,8 +195,8 @@ int rt_addr_getaddr_rsp_dump_parse(const struct nlmsghdr *nlh,
 	return YNL_PARSE_CB_OK;
 }
 
-std::unique_ptr<rt_addr_getaddr_rsp_list>
-rt_addr_getaddr_dump(ynl_cpp::ynl_socket& ys, rt_addr_getaddr_req_dump& req)
+std::unique_ptr<rt_addr_getaddr_list>
+rt_addr_getaddr_dump(ynl_cpp::ynl_socket& ys, rt_addr_getaddr_req& req)
 {
 	struct ynl_dump_no_alloc_state yds = {};
 	struct nlmsghdr *nlh;
@@ -204,12 +204,12 @@ rt_addr_getaddr_dump(ynl_cpp::ynl_socket& ys, rt_addr_getaddr_req_dump& req)
 	void *hdr;
 	int err;
 
-	auto ret = std::make_unique<rt_addr_getaddr_rsp_list>();
+	auto ret = std::make_unique<rt_addr_getaddr_list>();
 	yds.yarg.ys = ys;
 	yds.yarg.rsp_policy = &rt_addr_addr_attrs_nest;
 	yds.yarg.data = ret.get();
-	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<rt_addr_getaddr_rsp_list*>(arg)->objs.emplace_back());};
-	yds.cb = rt_addr_getaddr_rsp_dump_parse;
+	yds.alloc_cb = [](void* arg)->void* {return &(static_cast<rt_addr_getaddr_list*>(arg)->objs.emplace_back());};
+	yds.cb = rt_addr_getaddr_rsp_parse;
 	yds.rsp_cmd = 20;
 
 	nlh = ynl_msg_start_dump(ys, RTM_GETADDR);
