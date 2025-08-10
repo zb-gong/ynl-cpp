@@ -623,11 +623,20 @@ class TypeMultiAttr(Type):
     def _complex_member_type(self, ri):
         if "type" not in self.attr or self.attr["type"] == "nest":
             return self.nested_struct_type
+        elif self.attr["type"] == "binary" and "struct" in self.attr:
+            return None  # use arg_member()
         elif self.attr["type"] in scalars:
             scalar_pfx = "__" if ri.ku_space == "user" else ""
             return scalar_pfx + self.attr["type"]
         else:
             raise Exception(f"Sub-type {self.attr['type']} not supported yet")
+
+    def arg_member(self, ri):
+        if self.attr["type"] == "binary" and "struct" in self.attr:
+            return [
+                f'std::vector<struct {c_lower(self.attr["struct"])}> {self.c_name}',
+            ]
+        return super().arg_member(ri)
 
     def _attr_policy(self, policy):
         return self.base_type._attr_policy(policy)
@@ -644,6 +653,11 @@ class TypeMultiAttr(Type):
             ri.cw.p(f"for (unsigned int i = 0; i < {var}.{self.c_name}.size(); i++)")
             ri.cw.p(
                 f"ynl_attr_put_{put_type}(nlh, {self.enum_name}, {var}.{self.c_name}[i]);"
+            )
+        elif self.attr["type"] == "binary" and "struct" in self.attr:
+            ri.cw.p(f"for (unsigned int i = 0; i < {var}.{self.c_name}.size(); i++)")
+            ri.cw.p(
+                f"ynl_attr_put(nlh, {self.enum_name}, &{var}.{self.c_name}[i], sizeof(struct {c_lower(self.attr['struct'])}));"
             )
         elif "type" not in self.attr or self.attr["type"] == "nest":
             ri.cw.p(f"for (unsigned int i = 0; i < {var}.{self.c_name}.size(); i++)")
@@ -1851,6 +1865,12 @@ def _multi_parse(ri, struct, init_lines, local_vars):
             ri.cw.p("return YNL_PARSE_CB_ERROR;")
         elif aspec.type in scalars:
             ri.cw.p(f"dst->{aspec.c_name}[i] = ynl_attr_get_{aspec.type}(attr);")
+        elif aspec.type == "binary" and "struct" in aspec:
+            ri.cw.p("size_t len = ynl_attr_data_len(attr);")
+            ri.cw.nl()
+            ri.cw.p(f"if (len > sizeof(dst->{aspec.c_name}[0]))")
+            ri.cw.p(f"len = sizeof(dst->{aspec.c_name}[0]);")
+            ri.cw.p(f"memcpy(&dst->{aspec.c_name}[i], ynl_attr_data(attr), len);")
         else:
             raise Exception("Nest parsing type not supported yet")
         ri.cw.p("i++;")
