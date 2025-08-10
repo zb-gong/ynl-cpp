@@ -1705,6 +1705,7 @@ def put_op_name_fwd(family, cw):
 def put_op_name(family, cw):
     map_name = f"{family.c_name}_op_strmap"
     max_num = "0"
+    max_value = 0
     for op_name, op in family.msgs.items():
         if op.rsp_value:
             # Make sure we don't add duplicated entries, if multiple commands
@@ -1712,10 +1713,12 @@ def put_op_name(family, cw):
             if family.rsp_by_value[op.rsp_value] != op:
                 continue
 
-            if op.req_value == op.rsp_value:
+            if op.req_value == op.rsp_value and op.rsp_value > max_value:
                 max_num = f"{op.enum_name}"
-            else:
+                max_value = op.rsp_value
+            elif op.rsp_value > max_value:
                 max_num = f"{op.rsp_value}"
+                max_value = op.rsp_value
 
     cw.block_start(
         line=f"static constexpr std::array<std::string_view, {max_num} + 1> {map_name} = []()"
@@ -2250,8 +2253,18 @@ def render_user_family(family, cw, prototype):
 
     if family.ntfs:
         max_num = "0"
+        max_value = 0
         for ntf_op_name, ntf_op in family.ntfs.items():
-            max_num = ntf_op.enum_name
+            real_op = (
+                family.req_by_value[ntf_op.rsp_value] if family.is_classic() else ntf_op
+            )
+            if real_op.req_value and real_op.req_value > max_value:
+                max_value = real_op.req_value
+                max_num = real_op.enum_name
+            elif real_op.rsp_value and real_op.rsp_value > max_value:
+                max_value = real_op.rsp_value
+                max_num = real_op.enum_name
+
         cw.block_start(
             line=f"static constexpr std::array<ynl_ntf_info, {max_num} + 1> {family.c_name}_ntf_info = []()"
         )
