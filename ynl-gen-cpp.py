@@ -60,11 +60,19 @@ class Type(SpecAttr):
         self.request = False
         self.reply = False
 
+        self.is_selector = False
+
         if "len" in attr:
             self.len = attr["len"]
 
+        nested = None
         if "nested-attributes" in attr:
-            self.nested_attrs = attr["nested-attributes"]
+            nested = attr["nested-attributes"]
+        elif "sub-message" in attr:
+            nested = attr["sub-message"]
+
+        if nested:
+            self.nested_attrs = nested
             if self.nested_attrs == family.name:
                 self.nested_render_name = c_lower(f"{family.name}")
             else:
@@ -96,7 +104,9 @@ class Type(SpecAttr):
         return value
 
     def resolve(self):
-        if "name-prefix" in self.attr:
+        if "parent-sub-message" in self.attr:
+            enum_name = self.attr["parent-sub-message"].enum_name
+        elif "name-prefix" in self.attr:
             enum_name = f"{self.attr['name-prefix']}{self.name}"
         else:
             enum_name = f"{self.attr_set.name_prefix}{self.name}"
@@ -780,14 +790,75 @@ class TypeNestTypeValue(Type):
         return get_lines, init_lines, local_vars
 
 
+class TypeSubMessage(TypeNest):
+    def __init__(self, family, attr_set, attr, value):
+        super().__init__(family, attr_set, attr, value)
+
+        self.selector = Selector(attr, attr_set)
+
+    def _attr_typol(self):
+        typol = {
+            "type": "YNL_PT_NEST",
+            "nest": f"&{self.nested_render_name}_nest",
+            "is_submsg": 1,
+        }
+        # Reverse-parsing of the policy (ynl_err_walk() in ynl.c) does not
+        # support external selectors. No family uses sub-messages with external
+        # selector for requests so this is fine for now.
+        if not self.selector.is_external():
+            typol["selector_type"] = self.attr_set[self["selector"]].value
+        return typol
+
+    def _attr_get(self, ri, var):
+        sel = c_lower(self["selector"])
+        if self.selector.is_external():
+            sel_var = f"_sel_{sel}"
+        else:
+            sel_var = f"{var}->{sel}"
+        get_lines = [
+            f"if ({sel_var}.empty())",
+            f'return ynl_submsg_failed(yarg, "%s", "%s");'
+            % (self.name, self["selector"]),
+            f"if ({self.nested_render_name}_parse(&parg, {sel_var}, attr))",
+            "return YNL_PARSE_CB_ERROR;",
+        ]
+        init_lines = [
+            f"parg.rsp_policy = &{self.nested_render_name}_nest;",
+            f"parg.data = &{var}->{self.c_name};",
+        ]
+        return get_lines, init_lines, None
+
+
+class Selector:
+    def __init__(self, msg_attr, attr_set):
+        self.name = msg_attr["selector"]
+
+        if self.name in attr_set:
+            self.attr = attr_set[self.name]
+            self.attr.is_selector = True
+            self._external = False
+        else:
+            # The selector will need to get passed down thru the structs
+            self.attr = None
+            self._external = True
+
+    def set_attr(self, attr):
+        self.attr = attr
+
+    def is_external(self):
+        return self._external
+
+
 class Struct:
-    def __init__(self, family, space_name, type_list=None, inherited=None):
+    def __init__(self, family, space_name, type_list=None, inherited=None, submsg=None):
         self.family = family
         self.space_name = space_name
         self.attr_set = family.attr_sets[space_name]
         # Use list to catch comparisons with empty sets
         self._inherited = inherited if inherited is not None else []
         self.inherited = []
+
+        self.submsg = submsg
 
         self.nested = type_list is None
         if family.name == c_lower(space_name):
@@ -956,12 +1027,14 @@ class AttrSet(SpecAttrSet):
         elif elem["type"] == "nest":
             t = TypeNest(self.family, self, elem, value)
         elif elem["type"] == "indexed-array" and "sub-type" in elem:
-            if elem["sub-type"] in ["nest", "u32"]:
+            if elem["sub-type"] in ["nest", "u32", "binary"]:
                 t = TypeArrayNest(self.family, self, elem, value)
             else:
                 raise Exception(f'new_attr: unsupported sub-type {elem["sub-type"]}')
         elif elem["type"] == "nest-type-value":
             t = TypeNestTypeValue(self.family, self, elem, value)
+        elif elem["type"] == "sub-message":
+            t = TypeSubMessage(self.family, self, elem, value)
         else:
             raise Exception(f"No typed class for type {elem['type']}")
 
@@ -1144,19 +1217,91 @@ class Family(SpecFamily):
             for _, spec in self.attr_sets[name].items():
                 if "nested-attributes" in spec:
                     nested = spec["nested-attributes"]
-                    # If the unknown nest we hit is recursive it's fine, it'll be a pointer
-                    if self.pure_nested_structs[nested].recursive:
-                        continue
-                    if nested not in pns_key_seen:
-                        # Dicts are sorted, this will make struct last
-                        struct = self.pure_nested_structs.pop(name)
-                        self.pure_nested_structs[name] = struct
-                        finished = False
-                        break
+                elif "sub-message" in spec:
+                    nested = spec["sub-message"]
+                else:
+                    continue
+
+                # If the unknown nest we hit is recursive it's fine, it'll be a pointer
+                if self.pure_nested_structs[nested].recursive:
+                    continue
+                if nested not in pns_key_seen:
+                    # Dicts are sorted, this will make struct last
+                    struct = self.pure_nested_structs.pop(name)
+                    self.pure_nested_structs[name] = struct
+                    finished = False
+                    break
             if finished:
                 pns_key_seen.add(name)
             else:
                 pns_key_list.append(name)
+
+    def _load_nested_set_nest(self, spec):
+        inherit = set()
+        nested = spec["nested-attributes"]
+        if nested not in self.root_sets:
+            if nested not in self.pure_nested_structs:
+                self.pure_nested_structs[nested] = Struct(
+                    self, nested, inherited=inherit
+                )
+        else:
+            raise Exception(
+                f"Using attr set as root and nested not supported - {nested}"
+            )
+
+        if "type-value" in spec:
+            if nested in self.root_sets:
+                raise Exception(
+                    "Inheriting members to a space used as root not supported"
+                )
+            inherit.update(set(spec["type-value"]))
+        elif spec["type"] == "indexed-array":
+            inherit.add("idx")
+        self.pure_nested_structs[nested].set_inherited(inherit)
+
+        return nested
+
+    def _load_nested_set_submsg(self, spec):
+        # Fake the struct type for the sub-message itself
+        # its not a attr_set but codegen wants attr_sets.
+        submsg = self.sub_msgs[spec["sub-message"]]
+        nested = submsg.name
+
+        attrs = []
+        for name, fmt in submsg.formats.items():
+            attr = {
+                "name": name,
+                "parent-sub-message": spec,
+            }
+            if "attribute-set" in fmt:
+                attr |= {
+                    "type": "nest",
+                    "nested-attributes": fmt["attribute-set"],
+                }
+                if "fixed-header" in fmt:
+                    attr |= {"fixed-header": fmt["fixed-header"]}
+            elif "fixed-header" in fmt:
+                attr |= {
+                    "type": "binary",
+                    "struct": fmt["fixed-header"],
+                }
+            else:
+                attr["type"] = "flag"
+            attrs.append(attr)
+
+        self.attr_sets[nested] = AttrSet(
+            self,
+            {
+                "name": nested,
+                "name-pfx": self.name + "-" + spec.name + "-",
+                "attributes": attrs,
+            },
+        )
+
+        if nested not in self.pure_nested_structs:
+            self.pure_nested_structs[nested] = Struct(self, nested, submsg=submsg)
+
+        return nested
 
     def _load_nested_sets(self):
         attr_set_queue = list(self.root_sets.keys())
@@ -1165,39 +1310,26 @@ class Family(SpecFamily):
         while len(attr_set_queue):
             a_set = attr_set_queue.pop(0)
             for attr, spec in self.attr_sets[a_set].items():
-                if "nested-attributes" not in spec:
+                if "nested-attributes" in spec:
+                    nested = self._load_nested_set_nest(spec)
+                elif "sub-message" in spec:
+                    nested = self._load_nested_set_submsg(spec)
+                else:
                     continue
 
-                nested = spec["nested-attributes"]
                 if nested not in attr_set_seen:
                     attr_set_queue.append(nested)
                     attr_set_seen.add(nested)
 
-                inherit = set()
-                if nested not in self.root_sets:
-                    if nested not in self.pure_nested_structs:
-                        self.pure_nested_structs[nested] = Struct(
-                            self, nested, inherited=inherit
-                        )
-                else:
-                    raise Exception(
-                        f"Using attr set as root and nested not supported - {nested}"
-                    )
-
-                if "type-value" in spec:
-                    if nested in self.root_sets:
-                        raise Exception(
-                            "Inheriting members to a space used as root not supported"
-                        )
-                    inherit.update(set(spec["type-value"]))
-                elif spec["type"] == "indexed-array":
-                    inherit.add("idx")
-                self.pure_nested_structs[nested].set_inherited(inherit)
-
         for root_set, rs_members in self.root_sets.items():
             for attr, spec in self.attr_sets[root_set].items():
+                nested = None
                 if "nested-attributes" in spec:
                     nested = spec["nested-attributes"]
+                elif "sub-message" in spec:
+                    nested = spec["sub-message"]
+
+                if nested:
                     if attr in rs_members["request"]:
                         self.pure_nested_structs[nested].request = True
                     if attr in rs_members["reply"]:
@@ -1208,15 +1340,18 @@ class Family(SpecFamily):
         # Propagate the request / reply / recursive
         for attr_set, struct in reversed(self.pure_nested_structs.items()):
             for _, spec in self.attr_sets[attr_set].items():
+                child_name = None
                 if "nested-attributes" in spec:
                     child_name = spec["nested-attributes"]
-                    struct.child_nests.add(child_name)
-                    child = self.pure_nested_structs.get(child_name)
-                    if child:
-                        if not child.recursive:
-                            struct.child_nests.update(child.child_nests)
-                        child.request |= struct.request
-                        child.reply |= struct.reply
+                elif "sub-message" in spec:
+                    child_name = spec["sub-message"]
+                struct.child_nests.add(child_name)
+                child = self.pure_nested_structs.get(child_name)
+                if child:
+                    if not child.recursive:
+                        struct.child_nests.update(child.child_nests)
+                    child.request |= struct.request
+                    child.reply |= struct.reply
                 if attr_set in struct.child_nests:
                     struct.recursive = True
 
@@ -1326,7 +1461,7 @@ class RenderInfo:
 
         self.struct = dict()
         if op_mode == "notify":
-            op_mode = "do"
+            op_mode = "do" if "do" in op else "dump"
         for op_dir in ["request", "reply"]:
             if op:
                 type_list = []
@@ -1659,7 +1794,36 @@ def put_typol_fwd(cw, struct):
     cw.p(f"extern struct ynl_policy_nest {struct.render_name}_nest;")
 
 
+def put_typol_submsg(cw, struct):
+    member_list = struct.member_list()
+    member_cnt = len(member_list)
+    cw.block_start(
+        line=f"static std::array<ynl_policy_attr,{member_cnt}> {struct.render_name}_policy = []()"
+    )
+
+    cw.p(f"std::array<ynl_policy_attr,{member_cnt}> arr{{}};")
+    for i, (name, arg) in enumerate(member_list):
+        cw.p(f"arr[{i}].type = YNL_PT_SUBMSG;")
+        cw.p(f'arr[{i}].name = "{name}";')
+        if arg.type == "nest":
+            cw.p(f"arr[{i}].nest = &{arg.nested_render_name}_nest;")
+
+    cw.p("return arr;")
+    cw.block_end(line="();")
+    cw.nl()
+
+    cw.block_start(line=f"struct ynl_policy_nest {struct.render_name}_nest =")
+    cw.p(f".max_attr = {member_cnt},")
+    cw.p(f".table = {struct.render_name}_policy.data(),")
+    cw.block_end(line=";")
+    cw.nl()
+
+
 def put_typol(cw, struct):
+    if struct.submsg:
+        put_typol_submsg(cw, struct)
+        return
+
     type_max = struct.attr_set.max_name
     cw.block_start(
         line=f"static std::array<ynl_policy_attr,{type_max} + 1> {struct.render_name}_policy = []()"
@@ -1776,16 +1940,30 @@ def put_req_nested_prototype(ri, struct, suffix=";"):
 
 
 def put_req_nested(ri, struct):
+    local_vars = []
+    init_lines = []
+
+    if struct.submsg is None:
+        local_vars.append("struct nlattr *nest;")
+        init_lines.append("nest = ynl_attr_nest_start(nlh, attr_type);")
+
+    for _, arg in struct.member_list():
+        if arg.type == "indexed-array":
+            local_vars.append("struct nlattr *array;")
+            break
+
     put_req_nested_prototype(ri, struct, suffix="")
     ri.cw.block_start()
-    ri.cw.write_func_lvar("struct nlattr *nest;")
+    ri.cw.write_func_lvar(local_vars)
 
-    ri.cw.p("nest = ynl_attr_nest_start(nlh, attr_type);")
+    for line in init_lines:
+        ri.cw.p(line)
 
     for _, arg in struct.member_list():
         arg.attr_put(ri, "obj")
 
-    ri.cw.p("ynl_attr_nest_end(nlh, nest);")
+    if struct.submsg is None:
+        ri.cw.p("ynl_attr_nest_end(nlh, nest);")
 
     ri.cw.nl()
     ri.cw.p("return 0;")
@@ -1811,7 +1989,7 @@ def _multi_parse(ri, struct, init_lines, local_vars):
     needs_parg = False
     for arg, aspec in struct.member_list():
         if aspec["type"] == "indexed-array" and "sub-type" in aspec:
-            if aspec["sub-type"] == "nest":
+            if aspec["sub-type"] in ["nest", "binary"]:
                 local_vars.append(f"const struct nlattr *attr_{aspec.c_name};")
                 array_nests.add(arg)
             elif aspec["sub-type"] in scalars:
@@ -1822,6 +2000,7 @@ def _multi_parse(ri, struct, init_lines, local_vars):
         if "multi-attr" in aspec:
             multi_attrs.add(arg)
         needs_parg |= "nested-attributes" in aspec
+        needs_parg |= "sub-message" in aspec
     if array_nests or multi_attrs:
         local_vars.append("int i;")
     if needs_parg:
@@ -1940,8 +2119,48 @@ def _multi_parse(ri, struct, init_lines, local_vars):
     ri.cw.nl()
 
 
+def parse_rsp_submsg(ri, struct):
+    parse_rsp_nested_prototype(ri, struct, suffix="")
+
+    var = "dst"
+    local_vars = {
+        "const struct nlattr *attr = nested;",
+        f"{struct.ptr_name}{var} = static_cast<{struct.ptr_name}>(yarg->data);",
+        "struct ynl_parse_arg parg;",
+    }
+
+    for _, arg in struct.member_list():
+        _, _, l_vars = arg._attr_get(ri, var)
+        local_vars |= set(l_vars) if l_vars else set()
+
+    ri.cw.block_start()
+    ri.cw.write_func_lvar(list(local_vars))
+    ri.cw.p("parg.ys = yarg->ys;")
+    ri.cw.nl()
+
+    first = True
+    for name, arg in struct.member_list():
+        kw = "if" if first else "else if"
+        first = False
+
+        ri.cw.block_start(line=f'{kw} (sel == "{name}")')
+        get_lines, init_lines, _ = arg._attr_get(ri, var)
+        for line in init_lines or []:
+            ri.cw.p(line)
+        for line in get_lines:
+            ri.cw.p(line)
+        if arg.presence_type() == "present":
+            ri.cw.p(f"{var}->_present.{arg.c_name} = 1;")
+        ri.cw.block_end()
+    ri.cw.p("return 0;")
+    ri.cw.block_end()
+    ri.cw.nl()
+
+
 def parse_rsp_nested_prototype(ri, struct, suffix=";"):
     func_args = ["struct ynl_parse_arg *yarg", "const struct nlattr *nested"]
+    if struct.submsg:
+        func_args.insert(1, "const std::string& sel")
     for arg in struct.inherited:
         func_args.append("__u32 " + arg)
 
@@ -1951,6 +2170,9 @@ def parse_rsp_nested_prototype(ri, struct, suffix=";"):
 
 
 def parse_rsp_nested(ri, struct):
+    if struct.submsg:
+        return parse_rsp_submsg(ri, struct)
+
     parse_rsp_nested_prototype(ri, struct, suffix="")
 
     local_vars = [
@@ -2511,8 +2733,7 @@ def main():
                 has_recursive_nests = True
         if has_recursive_nests:
             cw.nl()
-        for name in parsed.pure_nested_structs:
-            struct = Struct(parsed, name)
+        for struct in parsed.pure_nested_structs.values():
             put_typol(cw, struct)
         for name in parsed.root_sets:
             struct = Struct(parsed, name)
