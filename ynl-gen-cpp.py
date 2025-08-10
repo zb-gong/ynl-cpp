@@ -2409,7 +2409,7 @@ def main():
         cw.p("#include <array>")
     cw.nl()
     headers = {parsed.uapi_header}
-    for definition in parsed["definitions"]:
+    for definition in parsed["definitions"] + parsed["attribute-sets"]:
         if "header" in definition:
             headers.add(definition["header"])
     for one in sorted(headers):
