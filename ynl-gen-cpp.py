@@ -2233,6 +2233,8 @@ def policy_should_be_static(family):
 
 
 def _render_user_ntf_entry(ri, op):
+    if ri.family.is_classic():
+        op = ri.family.req_by_value[op.rsp_value]
     ri.cw.p(f"arr[{op.enum_name}].policy\t\t= &{ri.struct['reply'].render_name}_nest;")
     ri.cw.p(f"arr[{op.enum_name}].cb\t\t= {op_prefix(ri, 'reply', deref=True)}_parse;")
     # ri.cw.p(f"arr[{op.enum_name}].alloc_sz\t= sizeof({type_name(ri, 'event')});")
