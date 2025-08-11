@@ -1290,6 +1290,11 @@ class RenderInfo:
         self.fixed_hdr = op.fixed_header if op else None
         self.fixed_hdr_len = "ys->family->hdr_len"
         if op and op.fixed_header:
+            if op.fixed_header != family.fixed_header:
+                if family.is_classic():
+                    self.fixed_hdr_len = f"sizeof(struct {c_lower(self.fixed_hdr)})"
+                else:
+                    raise Exception(f"Per-op fixed header not supported, yet")
             self.fixed_hdr = "struct " + c_lower(op.fixed_header)
 
         # 'do' and 'dump' response parsing is identical
@@ -1792,6 +1797,11 @@ def _multi_parse(ri, struct, init_lines, local_vars):
         if ri.fixed_hdr:
             local_vars += ["void *hdr;"]
         iter_line = "ynl_attr_for_each(attr, nlh, yarg->ys->family->hdr_len)"
+        if ri.op.fixed_header != ri.family.fixed_header:
+            if ri.family.is_classic():
+                iter_line = f"ynl_attr_for_each(attr, nlh, sizeof({ri.fixed_hdr}))"
+            else:
+                raise Exception(f"Per-op fixed header not supported, yet")
 
     array_nests = set()
     multi_attrs = set()
